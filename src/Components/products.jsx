@@ -1,5 +1,5 @@
 import React from 'react'
-import { Card, Col, Container, Row } from 'react-bootstrap'
+import { Container, Row } from 'react-bootstrap'
 import img1 from '../assets/Apple.png'
 import img2 from '../assets/dessart.webp'
 import img3 from '../assets/Avocado.webp'
@@ -9,8 +9,36 @@ import img6 from '../assets/soups.png'
 import RecipeCard from './RecipeCard'
 
 const products = () => {
+
+     const category=[
+        {
+            id:1,
+            title:"Healthy",
+            image:{img1},
+        },
+        {
+            id:2,
+            title:"Desserts",
+            image:{img2},
+        },
+        {
+            id:3,
+            title:"Vegitarians",
+            image:"",
+        },
+        {
+            id:6,
+            title:"Bakery",
+            image:"",
+        },
+        {
+            id:6,
+            title:"Soup",
+            image:{img6}
+        },
+    ]
     return (
-        <div>
+        <div id='products'>
             <Container fluid>
                 <Row>
                     <h2 className="h1 mb-4 pb-3 text-center">Popular categories</h2>
@@ -55,7 +83,11 @@ const products = () => {
 
                 </Row>
             </Container>
-            <RecipeCard/>
+            <div className='mt-5 mb-4'>
+                <Container fuild>
+                    <RecipeCard/>
+                </Container>
+            </div>
         </div>
     )
 }

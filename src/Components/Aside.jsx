@@ -1,90 +1,178 @@
-import React from 'react'
-import upper3 from '../assets/upper3.jpg'
+import React from "react";
+import { Container, ListGroup, Row, Col, Button, Card, Badge } from "react-bootstrap";
+import { FaFacebookF, FaTwitter, FaInstagram, FaGoogle } from "react-icons/fa";
 
-const Aside = () => {
-    return (
-        <div className="offcanvas offcanvas-collapse offcanvas-end" id="blog-sidebar">
-            <div className="offcanvas-cap navbar-shadow px-4 mb-3">
-                <h5 className="mt-1 mb-0">Sidebar</h5>
-                <button className="btn-close lead" type="button" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-            </div>
-            <div class="offcanvas-body px-4 pt-3 pt-lg-0 pe-lg-0 ps-lg-2 ps-xl-4" data-simplebar>
+function Aside() {
+  const recipes = [
+    {
+      image:
+        "https://images.unsplash.com/photo-1576618148400-f54bed99fcfd?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTl8fFN3ZWV0JTIwQ3JlYW0lMjBDdXBjYWtlfGVufDB8fDB8fHww",
+      title: "Sweet Cream Cupcake",
+      author: "Amalie Mayer",
+    },
+    {
+      image:
+        "https://media.istockphoto.com/id/1371994396/photo/delicious-egg-muffins-with-green-onions-bacon-cheese-and-tomatoes-on-wooden-board-on-old.webp?b=1&s=170667a&w=0&k=20&c=aYsaeX8h0w8s_E_nA22Pz-v66LGIKR6u6MygrkkCOro=",
+      title: "Egg Muffins",
+      author: "Amalie Mayer",
+    },
+    {
+      image:
+        "https://media.istockphoto.com/id/1444282976/photo/the-concept-of-healthy-tasty-desserts-tropical-chia-pudding-with-mango-flavor-in-a-glass.webp?b=1&s=170667a&w=0&k=20&c=yg0mzf_Z2YpmqpO6XiAp8IsO8kD86_TAfFqxvEDEzM0=",
+      title: "Mango Yogurt",
+      author: "Amalie Mayer",
+    },
+  ];
 
-                <div className="widget widget-categories mb-5">
-                    <h3 className="widget-title">Ingredients</h3>
-                    <ul>
-                        <li><a className="widget-link" href="#">Apple<small className="text-muted ps-1 ms-2">23</small></a></li>
-                        <li><a className="widget-link" href="#">Banana<small className="text-muted ps-1 ms-2">14</small></a></li>
-                        <li><a className="widget-link" href="#">Berries<small className="text-muted ps-1 ms-2">7</small></a></li>
-                        <li><a className="widget-link" href="#">Cabbage<small className="text-muted ps-1 ms-2">19</small></a></li>
-                        <li><a className="widget-link" href="#">Citrus<small className="text-muted ps-1 ms-2">26</small></a></li>
-                        <li><a className="widget-link" href="#">Corn<small className="text-muted ps-1 ms-2">8</small></a></li>
-                        <li><a className="widget-link" href="#">Cucumber<small className="text-muted ps-1 ms-2">25</small></a></li>
-                        <li><a className="widget-link" href="#">Egg<small className="text-muted ps-1 ms-2">14</small></a></li>
-                        <li><a className="widget-link" href="#">Herbs<small className="text-muted ps-1 ms-2">27</small></a></li>
-                        <li><a className="widget-link" href="#">Potato<small className="text-muted ps-1 ms-2">29</small></a></li>
-                        <li><a className="widget-link" href="#">Tomatoes<small className="text-muted ps-1 ms-2">32</small></a></li>
-                        <li><a className="widget-link" href="#">Watermelon<small className="text-muted ps-1 ms-2">4</small></a></li>
-                    </ul>
-                </div>
+  return (
+    <aside className=" py-3">
+      <Container>
+        <ListGroup>
+          <ListGroup.Item>
+            <span className="me-2">
+              <i className="bi bi-apple"></i>
+            </span>
+            Apple <span className="text-muted">(23)</span>
+          </ListGroup.Item>
+          <ListGroup.Item>
+            <span className="me-2">
+              <i className="bi bi-banana"></i>
+            </span>
+            Banana <span className="text-muted">(14)</span>
+          </ListGroup.Item>
+          <ListGroup.Item>
+            <span className="me-2">
+              <i className="bi bi-berry"></i>
+            </span>
+            Berries <span className="text-muted">(7)</span>
+          </ListGroup.Item>
+          <ListGroup.Item>
+            <span className="me-2">
+              <i className="bi bi-carrot"></i>
+            </span>
+            Cabbage <span className="text-muted">(19)</span>
+          </ListGroup.Item>
+          <ListGroup.Item>
+            <span className="me-2">
+              <i className="bi bi-lemon"></i>
+            </span>
+            Citrus <span className="text-muted">(28)</span>
+          </ListGroup.Item>
+          <ListGroup.Item>
+            <span className="me-2">
+              <i className="bi bi-corn"></i>
+            </span>
+            Corn <span className="text-muted">(8)</span>
+          </ListGroup.Item>
+          <ListGroup.Item>
+            <span className="me-2">
+              <i className="bi bi-cucumber"></i>
+            </span>
+            Cucumber <span className="text-muted">(25)</span>
+          </ListGroup.Item>
+          <ListGroup.Item>
+            <span className="me-2">
+              <i className="bi bi-egg"></i>
+            </span>
+            Egg <span className="text-muted">(14)</span>
+          </ListGroup.Item>
+          <ListGroup.Item>
+            <span className="me-2">
+              <i className="bi bi-flower"></i>
+            </span>
+            Herbs <span className="text-muted">(27)</span>
+          </ListGroup.Item>
+          <ListGroup.Item>
+            <span className="me-2">
+              <i className="bi bi-potato"></i>
+            </span>
+            Potato <span className="text-muted">(29)</span>
+          </ListGroup.Item>
+          <ListGroup.Item>
+            <span className="me-2">
+              <i className="bi bi-tomato"></i>
+            </span>
+            Tomatoes <span className="text-muted">(32)</span>
+          </ListGroup.Item>
+          <ListGroup.Item>
+            <span className="me-2">
+              <i className="bi bi-watermelon"></i>
+            </span>
+            Watermelon <span className="text-muted">(4)</span>
+          </ListGroup.Item>
+        </ListGroup>
+        <h2 className="mt-3">Popular Recipes</h2>
+        <Row xs={1} md={2} lg={3} className="g-3 d-flex flex-row">
+          {recipes.map((recipe, index) => (
+            <Col key={index} className="w-100">
+              <Card className="d-flex flex-row">
+                <Card.Img
+                  variant="top"
+                  src={recipe.image}
+                  className="w-75 aside-img"
+                  style={{ objectFit: "cover"}}
+                />
+                <Card.Body>
+                  <Card.Title className="fs-6">{recipe.title}</Card.Title>
+                  {/* <Card.Text>By {recipe.author}</Card.Text> */}
+                </Card.Body>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+        <h2 className="mb-4 mt-5">Popular tags</h2>
+        <Row className=" ">
+          <Col xs={6} md={6} lg={3} className="d-flex flex-wrap w-100 gap-3">
+            <Badge className=" mb-2">
+              #bakery
+            </Badge>
 
-                <div className="widget mt-n1 mb-5">
-                    <h3 className="widget-title pb-1">Popular recipes</h3>
-                    <div className="d-flex align-items-start pb-1 mb-3">
-                        <a className="d-block flex-shrink-0" href="#">
-                            <img className="rounded" src={upper3} alt="Post" width="64" /></a>
-                        <div className="ps-2 ms-1">
-                            <h4 className="fs-md nav-heading mb-1">
-                                <a className="fw-medium" href="#">Sweet Cream Cupcake</a></h4>
-                            <p class="fs-xs text-muted mb-0">by Amelie Mayer</p>
-                        </div>
-                    </div>
-                    <div className="d-flex align-items-start pb-1 mb-3">
-                        <a className="d-block flex-shrink-0" href="#">
-                            <img className="rounded" src={upper3} alt="Post" width="64" /></a>
-                        <div className="ps-2 ms-1">
-                            <h4 className="fs-md nav-heading mb-1">
-                                <a className="fw-medium" href="#">Keto Paleo Carb-Free Breakfast</a></h4>
-                            <p className="fs-xs text-muted mb-0">by Amelie Mayer</p>
-                        </div>
-                    </div>
-                    <div className="d-flex align-items-start pb-1 mb-3">
-                        <a className="d-block flex-shrink-0" href="#">
-                            <img className="rounded" src={upper3} alt="Post" width="64" /></a>
-                        <div className="ps-2 ms-1">
-                            <h4 className="fs-md nav-heading mb-1">
-                                <a className="fw-medium" href="#">Sugar-Free Coconut Yogurt with Mango</a></h4>
-                            <p className="fs-xs text-muted mb-0">by Amelie Mayer</p>
-                        </div>
-                    </div>
-                </div>
+            <Badge className=" mb-2">
+              #cookbook
+            </Badge>
 
-                <div className="widget mb-5">
-                    <h3 className="widget-title pb-1">Popular tags</h3>
-                    <a className="btn-tag me-2 mb-2" href="#">#bakery</a>
-                    <a className="btn-tag me-2 mb-2" href="#">#cookbook</a>
-                    <a className="btn-tag me-2 mb-2" href="#">#cuisine</a>
-                    <a className="btn-tag me-2 mb-2" href="#">#asian food</a>
-                    <a className="btn-tag me-2 mb-2" href="#">#tips</a>
-                    <a className="btn-tag me-2 mb-2" href="#">#recipe</a>
-                    <a className="btn-tag me-2 mb-2" href="#">#chef</a>
-                    <a className="btn-tag me-2 mb-2" href="#">#vegetarian</a>
-                </div>
-
-                <div className="mb-5">
-                    <h3 className="widget-title pb-1">Follow me</h3>
-                    <a className="btn-social bs-outline bs-facebook me-2 mb-2" href="#">
-                        <i className="ai-facebook"></i></a>
-                    <a className="btn-social bs-outline bs-twitter me-2 mb-2" href="#">
-                        <i className="ai-twitter"></i></a>
-                    <a className="btn-social bs-outline bs-instagram me-2 mb-2" href="#">
-                        <i className="ai-instagram"></i></a>
-                    <a className="btn-social bs-outline bs-pinterest me-2 mb-2" href="#">
-                        <i className="ai-pinterest"></i></a>
-                </div>
-            </div>
+            <Badge  className="mb-2">
+              #cuisine
+            </Badge>
+            <Badge  className=" mb-2">
+              #asianfood
+            </Badge>
+       
+            <Badge  className=" mb-2">
+              #tips
+            </Badge>
+        
+            <Badge  className=" mb-3">
+              #recipe
+            </Badge>
+        
+            <Badge className=" mb-3">
+              #chef
+            </Badge>
+         
+            <Badge  className=" mb-3">
+              #vegetarian
+            </Badge>
+          </Col>
+        </Row>
+        <h2 className="mb-4 mt-4">Follow me</h2>
+        <div className="social-media">
+          <Button variant="outline-primary" className="me-2">
+            <FaFacebookF />
+          </Button>
+          <Button variant="outline-info" className="me-2">
+            <FaTwitter />
+          </Button>
+          <Button variant="outline-danger" className="me-2">
+            <FaInstagram />
+          </Button>
+          <Button variant="outline-secondary">
+            <FaGoogle />
+          </Button>
         </div>
-    )
+      </Container>
+    </aside>
+  );
 }
 
-export default Aside
+export default Aside;

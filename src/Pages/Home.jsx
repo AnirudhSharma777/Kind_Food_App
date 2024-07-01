@@ -7,7 +7,9 @@ import second from '../assets/Frame3.mp4'
 import Product from '../Components/products'
 import CardItem from '../Components/cardItem'
 import { products } from '../Data/cardItem'
-
+import ImageSlider from '../Components/Home/ImageSlider'
+import Intro from '../Components/About/Intro'
+import ProductCard from '../Components/Home/ProductCard'
 
 const Home = () => {
 
@@ -45,7 +47,7 @@ const Home = () => {
                     {
                       items.dishes.map((item, i) => (
 
-                        <CardItem key={i} item={item} />
+                        <ProductCard key={i} item={item} />
                       ))
                     }
                   </div>
@@ -56,7 +58,8 @@ const Home = () => {
         </Row>
       </Container>
       <Product />
-   
+      <Intro/>
+      <ImageSlider/>
     </div>
   )
 }

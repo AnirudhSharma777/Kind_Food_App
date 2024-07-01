@@ -7,6 +7,7 @@ import Login from './Pages/Login';
 import Signup from './Pages/Signup';
 import Contact from './Pages/Contact';
 import Spinner from './Components/common/spinner';
+import Footer from './Components/common/Footer';
 const App = () => {
 
   return (
@@ -22,6 +23,9 @@ const App = () => {
         <Route path='/signup' element={<Signup/>}/>
         <Route path='/contact' element={<Contact/>}/>
       </Routes>
+      <div>
+        <Footer/>
+      </div>
     </div>
   )
 }
