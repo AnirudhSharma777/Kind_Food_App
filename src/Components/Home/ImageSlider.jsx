@@ -26,14 +26,28 @@ import {
     MDBCardBody,
     MDBCardText,
     MDBCardImage
-  } from 'mdb-react-ui-kit';
-  
+} from 'mdb-react-ui-kit';
+
 
 const ImageSlider = () => {
     return (
-        <Container fluid className='bg-white' >
+        <Container fluid className='bg-white mb-5' >
             <h2 className='text-center p-5'>Follow On <a href='/about' className='text-primary '>@KING-fOOD</a> Instagram</h2>
             <Swiper
+                // breakpoints={{
+                //     576: {
+                //         // width: 576,
+                //         slidesPerView: 1,
+                //     },
+                //     768: {
+                //         // width: 768,
+                //         slidesPerView: 2,
+                //     },
+                //     1000:{
+                //         // width:1000,
+                //         slidesPerView:3
+                //     }
+                // }}
                 slidesPerView={4}
                 spaceBetween={30}
                 pagination={{
@@ -43,9 +57,9 @@ const ImageSlider = () => {
                 className="mySwiper"
             >
                 {
-                    [img1, img2, img3, img4, img5, img6].map((item,id) => (
+                    [img1, img2, img3, img4, img5, img6].map((item, id) => (
                         <SwiperSlide key={id}>
-                            <MDBCard>
+                            <MDBCard className='d-flex flex-wrap'>
                                 <MDBCardImage src={item} alt='...' position='top' />
                                 <MDBCardBody>
                                     <MDBCardText className='fs-6'>

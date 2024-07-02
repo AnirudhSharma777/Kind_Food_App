@@ -42,8 +42,10 @@ const Footer = () => {
               <h5 style={{ color: '#1585fd' }}>Pages</h5>
               <div className="d-flex flex-column">
               <a href='#products'>Products</a>
-                <Link to={"/about"}>About Us</Link>
-                <Link to={"/contact"}>Contacts
+                <Link to={"/about"}>
+                <span>About Us</span>
+                </Link>
+                <Link to={"/contact"}> <span>Contacts</span>
                 </Link> </div>
             </div>
 

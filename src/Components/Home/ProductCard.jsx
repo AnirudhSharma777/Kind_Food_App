@@ -1,4 +1,4 @@
-import React from 'react';
+import React ,{useState}from 'react';
 
 import {
   MDBCard,
@@ -8,27 +8,69 @@ import {
   MDBCardImage,
   MDBRow,
   MDBCol,
-  MDBIcon,
+  MDBBadge,
+  MDBRipple,
+  MDBIcon
 } from 'mdb-react-ui-kit';
+import CardDetails from './CardDetails';
 
 export default function App(props) {
+
+
+  const [readmore, setreadmore] = useState(false);
+  const description = readmore ? ` ${props.item.genres}` : ` ${props.item.genres.substring(0, 10)}.... `;
+
+  function readMorehandler() {
+    setreadmore(!readmore);
+  }
   return (
-    <MDBCard className="my-3" >
-      <MDBRow className="g-0" style={{ width: '18rem',height:'22rem' }}>
+    <MDBCard className="mt-3 d-flex flex-lg-row flex-xxl-row flex-sm-column justify-content-center mx-auto" >
+      <MDBRow className="g-0" style={{ width: '18rem', height: '22rem' }}>
         <MDBCol >
-          <MDBCardImage src={props.item.image} alt="KFC Food" fluid />
+          <MDBRow className=''>
+            <MDBCol lg={12} className=''>
+              <MDBRipple rippleColor='light' rippleTag='div' className='bg-image hover-overlay'>
+                <MDBCardImage src={props.item.image} alt="Food" className='img1' />
+                <a>
+                  <div className='mask' style={{ backgroundColor: 'rgba(251, 251, 251, 0.15)' }}></div>
+                </a>
+              </MDBRipple>
+            </MDBCol>
+          </MDBRow>
           <MDBCardBody>
-            <MDBCardTitle>{props.item.heading}</MDBCardTitle>
-            <MDBCardText>Burger, Rolls, Fast Food</MDBCardText>
-            <MDBCardText>
-              <small className="text-muted">₹200 for one</small>
-            </MDBCardText>
-            <MDBCardText>
-              <MDBIcon fas icon="star" className="text-warning" /> 4.2
-            </MDBCardText>
-            <MDBCardText>
-              <small className="text-muted">17 min</small>
-            </MDBCardText>
+            <MDBRow className='p-1'>
+              <MDBCol >
+                <MDBCardTitle className='fs-6'>{props.item.heading}</MDBCardTitle>
+              </MDBCol>
+              <MDBCol className='d-flex justify-content-end mb-3'>
+                <MDBBadge className='bg-success'>{props.item.rating}</MDBBadge>
+              </MDBCol>
+            </MDBRow>
+            <MDBRow className=' p-1'>
+              <MDBCol>
+                <MDBCardText className='comment'>{description}</MDBCardText>
+              </MDBCol>
+              <MDBCol>
+                <MDBCardText className='d-flex flex-row justify-content-end'>
+
+                  <small className="text-muted">
+                    {props.item.price}
+                  </small>
+
+                </MDBCardText>
+              </MDBCol>
+            </MDBRow>
+            <MDBRow className='p-1 mt-1'>
+              <MDBCol >
+
+                <CardDetails props={props.item} />
+              </MDBCol>
+              <MDBCol >
+                <MDBCardText className='d-flex justify-content-end'>
+                  <small className="text-muted">{props.item.time}</small>
+                </MDBCardText>
+              </MDBCol>
+            </MDBRow>
           </MDBCardBody>
         </MDBCol>
       </MDBRow>

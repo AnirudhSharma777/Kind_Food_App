@@ -1,25 +1,36 @@
 import React, { useState } from 'react';
-import { Container, Row, Col, Form, Button, Card, CardBody } from 'react-bootstrap';
+import { Container, Row, Col, Form, Button, Modal, ModalBody } from 'react-bootstrap';
 import { FaFacebookF, FaTwitter, FaInstagram, FaGoogle } from 'react-icons/fa';
 
 function Login() {
+
+  const [show, setShow] = useState(false);
+
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
   };
 
   return (
-   <div className='bg'>
-     <Container fluid>
-      <Row className="d-flex justify-content-center align-items-center vh-100">
-        <Col xs={12} md={4} lg={4} >
-          <Card className='bg-transparent border-0 back' style={{color:'#f3a904'}}>
-            <CardBody>
-              <h2 className="text-center mb-4">Sign In</h2>
+    <Container >
+      <Button onClick={handleShow} variant="outline-primary" >SignIn</Button>
+      <Modal
+       show={show} onHide={handleClose}
+        className='back' closeButton
+      >
+        <Modal.Header closeButton>
+          <h2 >Sign In</h2>
+        </Modal.Header>
+        <Row className="justify-content-center">
+          <Col>
+            <ModalBody>
               <Form onSubmit={handleSubmit}>
                 <Form.Group className="mb-3">
                   <Form.Label>Email</Form.Label>
@@ -73,12 +84,12 @@ function Login() {
                   </Button>
                 </div>
               </div>
-            </CardBody>
-          </Card>
-        </Col>
-      </Row>
+            </ModalBody>
+          </Col>
+        </Row>
+
+      </Modal>
     </Container>
-   </div>
   );
 }
 

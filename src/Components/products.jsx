@@ -38,7 +38,7 @@ const products = () => {
         },
     ]
     return (
-        <div id='products'>
+        <div >
             <Container fluid>
                 <Row>
                     <h2 className="h1 mb-4 pb-3 text-center">Popular categories</h2>

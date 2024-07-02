@@ -2,6 +2,8 @@ import React from "react";
 import { Container, ListGroup, Row, Col, Button, Card, Badge } from "react-bootstrap";
 import { FaFacebookF, FaTwitter, FaInstagram, FaGoogle } from "react-icons/fa";
 
+
+
 function Aside() {
   const recipes = [
     {
@@ -109,11 +111,11 @@ function Aside() {
                 <Card.Img
                   variant="top"
                   src={recipe.image}
-                  className="w-75 aside-img"
-                  style={{ objectFit: "cover"}}
+                  className="w-25 img2"
+                  style={{ objectFit: "cover" }}
                 />
                 <Card.Body>
-                  <Card.Title className="fs-6">{recipe.title}</Card.Title>
+                  <Card.Title>{recipe.title}</Card.Title>
                   {/* <Card.Text>By {recipe.author}</Card.Text> */}
                 </Card.Body>
               </Card>
@@ -123,34 +125,34 @@ function Aside() {
         <h2 className="mb-4 mt-5">Popular tags</h2>
         <Row className=" ">
           <Col xs={6} md={6} lg={3} className="d-flex flex-wrap w-100 gap-3">
-            <Badge className=" mb-2">
+            <Badge className=" mb-3">
               #bakery
             </Badge>
 
-            <Badge className=" mb-2">
+            <Badge className=" mb-3">
               #cookbook
             </Badge>
 
-            <Badge  className="mb-2">
+            <Badge className="mb-3">
               #cuisine
             </Badge>
-            <Badge  className=" mb-2">
+            <Badge className=" mb-3">
               #asianfood
             </Badge>
-       
-            <Badge  className=" mb-2">
+
+            <Badge className=" mb-3">
               #tips
             </Badge>
-        
-            <Badge  className=" mb-3">
+
+            <Badge className=" mb-3">
               #recipe
             </Badge>
-        
+
             <Badge className=" mb-3">
               #chef
             </Badge>
-         
-            <Badge  className=" mb-3">
+
+            <Badge className=" mb-3">
               #vegetarian
             </Badge>
           </Col>
