@@ -9,6 +9,8 @@ import {
   ModalBody,
 } from "react-bootstrap";
 import { FaFacebookF, FaTwitter, FaInstagram, FaGoogle } from "react-icons/fa";
+import { Link } from 'react-router-dom';
+import Login from "./Login"
 
 function Example() {
   const [show, setShow] = useState(false);
@@ -109,7 +111,11 @@ function Example() {
               </Form>
               <div className="text-center mt-4 ">
                 <p className="text-muted">
-                  Already have an account? <a href="#">Sign In</a>
+                  Already have an account?
+                  {/* <Link to={<Login/>}>
+                  SignUp
+                  </Link> */}
+                  <a href="#">Login</a>
                 </p>
 
                 <div className="social-media mt-2">

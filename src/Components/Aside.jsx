@@ -1,7 +1,7 @@
 import React from "react";
 import { Container, ListGroup, Row, Col, Button, Card, Badge } from "react-bootstrap";
 import { FaFacebookF, FaTwitter, FaInstagram, FaGoogle } from "react-icons/fa";
-
+import { MDBBadge } from 'mdb-react-ui-kit';
 
 
 function Aside() {
@@ -34,73 +34,117 @@ function Aside() {
             <span className="me-2">
               <i className="bi bi-apple"></i>
             </span>
-            Apple <span className="text-muted">(23)</span>
+            Apple <span className="text-muted"><MDBBadge className='ms-2' color='danger'>
+        23
+      </MDBBadge></span>
           </ListGroup.Item>
           <ListGroup.Item>
             <span className="me-2">
               <i className="bi bi-banana"></i>
             </span>
-            Banana <span className="text-muted">(14)</span>
+            Banana <span className="text-muted">
+              <MDBBadge className='ms-2' color='danger'>
+                9
+              </MDBBadge>
+            </span>
           </ListGroup.Item>
           <ListGroup.Item>
             <span className="me-2">
               <i className="bi bi-berry"></i>
             </span>
-            Berries <span className="text-muted">(7)</span>
+            Berries <span className="text-muted">
+            <MDBBadge className='ms-2' color='danger'>
+        50
+      </MDBBadge>
+            </span>
           </ListGroup.Item>
           <ListGroup.Item>
             <span className="me-2">
               <i className="bi bi-carrot"></i>
             </span>
-            Cabbage <span className="text-muted">(19)</span>
+            Cabbage <span className="text-muted">
+            <MDBBadge className='ms-2' color='danger'>
+        19
+      </MDBBadge>
+            </span>
           </ListGroup.Item>
           <ListGroup.Item>
             <span className="me-2">
               <i className="bi bi-lemon"></i>
             </span>
-            Citrus <span className="text-muted">(28)</span>
+            Citrus <span className="text-muted"><MDBBadge className='ms-2' color='danger'>
+        29
+      </MDBBadge></span>
           </ListGroup.Item>
           <ListGroup.Item>
             <span className="me-2">
               <i className="bi bi-corn"></i>
             </span>
-            Corn <span className="text-muted">(8)</span>
+            Corn <span className="text-muted">
+            <MDBBadge className='ms-2' color='danger'>
+        18
+      </MDBBadge>
+            </span>
           </ListGroup.Item>
           <ListGroup.Item>
             <span className="me-2">
               <i className="bi bi-cucumber"></i>
             </span>
-            Cucumber <span className="text-muted">(25)</span>
+            Cucumber <span className="text-muted">
+            <MDBBadge className='ms-2' color='danger'>
+        25
+      </MDBBadge>
+            </span>
           </ListGroup.Item>
           <ListGroup.Item>
             <span className="me-2">
               <i className="bi bi-egg"></i>
             </span>
-            Egg <span className="text-muted">(14)</span>
+            Egg <span className="text-muted">
+            <MDBBadge className='ms-2' color='danger'>
+        14
+      </MDBBadge>
+            </span>
           </ListGroup.Item>
           <ListGroup.Item>
             <span className="me-2">
               <i className="bi bi-flower"></i>
             </span>
-            Herbs <span className="text-muted">(27)</span>
+            Herbs <span className="text-muted">
+            <MDBBadge className='ms-2' color='danger'>
+        27
+      </MDBBadge>
+            </span>
           </ListGroup.Item>
           <ListGroup.Item>
             <span className="me-2">
               <i className="bi bi-potato"></i>
             </span>
-            Potato <span className="text-muted">(29)</span>
+            Potato <span className="text-muted">
+            <MDBBadge className='ms-2' color='danger'>
+       29
+      </MDBBadge>
+            </span>
           </ListGroup.Item>
           <ListGroup.Item>
             <span className="me-2">
               <i className="bi bi-tomato"></i>
             </span>
-            Tomatoes <span className="text-muted">(32)</span>
+            Tomatoes <span className="text-muted">
+            <MDBBadge className='ms-2' color='danger'>
+        32
+      </MDBBadge>
+            </span>
           </ListGroup.Item>
           <ListGroup.Item>
             <span className="me-2">
               <i className="bi bi-watermelon"></i>
             </span>
-            Watermelon <span className="text-muted">(4)</span>
+            Watermelon <span className="text-muted">
+            <MDBBadge className='ms-2' color='danger'>
+        9
+      </MDBBadge>
+            </span>
           </ListGroup.Item>
         </ListGroup>
         <h2 className="mt-3">Popular Recipes</h2>

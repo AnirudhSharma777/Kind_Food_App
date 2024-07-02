@@ -32,7 +32,7 @@ import {
 const ImageSlider = () => {
     return (
         <Container fluid className='bg-white mb-5' >
-            <h2 className='text-center p-5'>Follow On <a href='/about' className='text-primary '>@KING-fOOD</a> Instagram</h2>
+            <h2 className='text-center p-5'>Follow <a href='/about' className='text-primary '>@KING-fOOD </a>on Instagram</h2>
             <Swiper
                 // breakpoints={{
                 //     576: {

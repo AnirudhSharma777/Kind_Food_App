@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Container, Row, Col, Form, Button, Modal, ModalBody } from 'react-bootstrap';
 import { FaFacebookF, FaTwitter, FaInstagram, FaGoogle } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
+import Signup from "./Signup"
 
 function Login() {
 
@@ -64,7 +66,11 @@ function Login() {
               </Form>
               <div className="text-center mt-4">
                 <p className="text-muted">
-                  Don't have an account? <a href="#">Sign up</a>
+                  Don't have an account? 
+                  {/* <Link to={<Signup/>}>
+                  SignUp
+                  </Link> */}
+                  <a href="#">Signup</a>
                 </p>
                 <p className="text-muted">
                   Forgot your password? <a href="#">Reset password</a>

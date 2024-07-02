@@ -13,8 +13,24 @@ import {
   MDBIcon
 } from 'mdb-react-ui-kit';
 import CardDetails from './CardDetails';
+import { toast } from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
+import {add ,remove} from "../../Redux/slices/cartSlice";
 
 export default function App(props) {
+
+  const {cart} = useSelector((state) => state);
+  const dispatch = useDispatch();
+
+  const addToCart = () => {
+    dispatch(add(props.item));
+    toast.success("Item added to Cart");
+  }
+
+  const removeFromCart = () => {
+    dispatch(remove(props.item.id));
+    toast.error("Item removed from Cart");
+  }
 
 
   const [readmore, setreadmore] = useState(false);
@@ -23,14 +39,15 @@ export default function App(props) {
   function readMorehandler() {
     setreadmore(!readmore);
   }
+
   return (
-    <MDBCard className="mt-3 d-flex flex-lg-row flex-xxl-row flex-sm-column justify-content-center mx-auto" >
+    <MDBCard className="mt-3 d-flex flex-lg-row flex-xxl-row flex-sm-column justify-content-center mx-auto shadow rounded-4 " >
       <MDBRow className="g-0" style={{ width: '18rem', height: '22rem' }}>
         <MDBCol >
           <MDBRow className=''>
             <MDBCol lg={12} className=''>
               <MDBRipple rippleColor='light' rippleTag='div' className='bg-image hover-overlay'>
-                <MDBCardImage src={props.item.image} alt="Food" className='img1' />
+                <MDBCardImage  src={props.item.image} alt="Food" className='img1  rounded' />
                 <a>
                   <div className='mask' style={{ backgroundColor: 'rgba(251, 251, 251, 0.15)' }}></div>
                 </a>

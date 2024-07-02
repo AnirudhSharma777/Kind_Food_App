@@ -8,8 +8,10 @@ import img5 from '../assets/seafood.webp'
 import img6 from '../assets/soups.png'
 import RecipeCard from './RecipeCard'
 
+
 const products = () => {
 
+   
      const category=[
         {
             id:1,

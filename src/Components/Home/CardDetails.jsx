@@ -10,7 +10,7 @@ function CardDetails(props) {
   const handleShow = () => setShow(true);
   return (
     <>
-    <MDBBtn style={{ width: '5rem',height:'2.5rem' }} onClick={handleShow}outline>Details</MDBBtn>
+    <MDBBtn style={{ width: '5rem',height:'2.5rem' }} onClick={handleShow}outline>Order</MDBBtn>
 
       <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
