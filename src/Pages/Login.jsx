@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Container, Row, Col, Form, Button, Modal, ModalBody } from 'react-bootstrap';
 import { FaFacebookF, FaTwitter, FaInstagram, FaGoogle } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
-import Signup from "./Signup"
+import {AiOutlineEyeInvisible, AiOutlineEye} from 'react-icons/ai';
+import {useNavigate} from 'react-router-dom';
+import {useDispatch} from 'react-redux'
+import  {login} from '../Services/operation/authApi'
 
 function Login() {
 
@@ -11,14 +13,29 @@ function Login() {
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
+  const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const {email, password } = formData;
+  
+  const handleOnChange = (e) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [e.target.name] : e.target.value,
+    }))
+  }
 
-  };
+  const handleOnSubmit = (e) => {
+    e.preventDefault();
+    dispatch(login(email,password, navigate));
+  }
 
   return (
     <Container >
@@ -33,24 +50,36 @@ function Login() {
         <Row className="justify-content-center">
           <Col>
             <ModalBody>
-              <Form onSubmit={handleSubmit}>
+              <Form onSubmit={handleOnSubmit}>
                 <Form.Group className="mb-3">
                   <Form.Label>Email</Form.Label>
                   <Form.Control
                     type="email"
                     placeholder="Enter your email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    name='email'
+                    onChange={handleOnChange}
                   />
                 </Form.Group>
                 <Form.Group className="mb-3">
                   <Form.Label>Password</Form.Label>
                   <Form.Control
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     placeholder="Enter your password"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    name="password"
+                    onChange={handleOnChange}
                   />
+                  <div >
+                  {
+                    showPassword ? (
+                      <AiOutlineEyeInvisible fontSize={24} fill="#AFB2BF" />
+                    ) :
+                      (
+                        <AiOutlineEye fontSize={24} fill="#AFB2BF" />
+                      )
+                  }
+                  </div>
                 </Form.Group>
                 <Form.Group className="mb-3">
                   <Form.Check

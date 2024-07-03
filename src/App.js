@@ -5,7 +5,7 @@ import {Routes,Route} from 'react-router-dom'
 import About from './Pages/About';
 import Contact from './Pages/Contact';
 import Cart from './Pages/Cart';
-import Spinner from './Components/common/spinner';
+// import Spinner from './Components/common/spinner';
 import Footer from './Components/common/Footer';
 const App = () => {
 
@@ -16,10 +16,10 @@ const App = () => {
       </div>
       
       <Routes>
-        <Route path='/' element={<Home/>}/>
-        <Route path='/about' element={<About/>}/>
-        <Route path='/carts' element={<Cart/>}/>
-        <Route path='/contact' element={<Contact/>}/>
+        <Route path='*' element={<Home/>}/>
+        <Route path='about' element={<About/>}/>
+        <Route path='carts' element={<Cart/>}/>
+        <Route path='contact' element={<Contact/>}/>
       </Routes>
       <div>
         <Footer/>
