@@ -14,7 +14,7 @@ const App = () => {
       <div className=''>
         <Header />
       </div>
-      <Spinner/>
+      // <Spinner/>
       <Routes>
         <Route path='/' element={<Home/>}/>
         <Route path='/about' element={<About/>}/>
