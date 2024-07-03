@@ -48,17 +48,17 @@ const ImageSlider = () => {
                 //         slidesPerView:3
                 //     }
                 // }}
-                slidesPerView={4}
+                slidesPerView={1}
                 spaceBetween={30}
                 pagination={{
                     clickable: true,
                 }}
                 modules={[Pagination]}
-                className="mySwiper"
+                className="mySwiper "
             >
                 {
                     [img1, img2, img3, img4, img5, img6].map((item, id) => (
-                        <SwiperSlide key={id}>
+                        <SwiperSlide key={id} slidesPerView={1}>
                             <MDBCard className='d-flex flex-wrap'>
                                 <MDBCardImage src={item} alt='...' position='top' />
                                 <MDBCardBody>

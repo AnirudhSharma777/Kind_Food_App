@@ -1,23 +1,25 @@
 import React from 'react'
-import { Container, Row, Col, Button } from 'react-bootstrap'
+import { Container, Row, Col, Button, Image } from 'react-bootstrap'
 import author from '../../assets/main.jpg'
+
 const Intro = () => {
   return (
-    <Container fluid className='mt-5 mx-auto  bg-white d-flex align-items-center ' style={{height:'600px'}}>
-        <Row>
-            <Col lg={6}>
-            <img src={author} alt="img" className='rounded ms-4' width={450} height={430} />
-            </Col>
-            <Col lg={6} className='gap-3 d-flex align-self-start flex-column  mt-4'>
-            <h1>Hi! I am Sam</h1>
-            <p>Amateur chef and creator of this blog</p>
-            <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Delectus repellendus, voluptates qui dicta reiciendis harum id consequuntur aliquam aperiam quos. Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sapiente, suscipit. Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellat, pariatur.</p>
-            <Button className='bg-primary text-white w-50'>
-                Get to Know me better
-            </Button>
-            </Col>
-        </Row>
+    <Container className='p-5 mx-auto'>
+      <Row className='gap-5 d-flex justify-content-center align-items-center flex-lg-row flex-md-column flex-sm-column'>
+        <Col className='d-flex justify-content-center align-items-center'>
+          <Image src={author} roundedCircle className='Intro shadow' />
+        </Col>
+        <Col className='d-flex flex-column gap-3 justify-content-center align-items-center text-center'>
+          <h1 className='text-primary fs-4'>Hi! I am Sam</h1>
+          <p>Amateur chef and creator of this blog</p>
+          <p>Lorem, ipsum dolor sit amet consectetur Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellat, pariatur.</p>
+          <Button className='shadow'>
+            Get to Know me better
+          </Button>
+        </Col>
+      </Row>
     </Container>
+
   )
 }
 

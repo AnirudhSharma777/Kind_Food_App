@@ -15,10 +15,10 @@ import { Pagination } from 'swiper/modules';
 const ReviewCard = () => {
     return (
         <div>
-            <Container fluid>
+            <Container>
 
                 <Swiper
-                    slidesPerView={2}
+                    slidesPerView={1}
                     spaceBetween={30}
                     pagination={{
                         clickable: true,
@@ -30,7 +30,7 @@ const ReviewCard = () => {
                         ReviewCartData.map((item) => {
                             // console.log(item);
                             return (
-                                <SwiperSlide key={item.id}>
+                                <SwiperSlide key={item.id} slidesPerView={1}>
                                     <CardForReview item={item} />
                                 </SwiperSlide>
                             )

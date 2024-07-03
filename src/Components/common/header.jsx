@@ -1,5 +1,5 @@
 import React from 'react'
-import { Navbar, Nav, Button, Container, NavDropdown } from 'react-bootstrap';
+import { Navbar, Nav, Container, NavDropdown } from 'react-bootstrap';
 import logo from '../../assets/logo.png'
 import Signup from '../../Pages/Signup'
 import Login from '../../Pages/Login'
@@ -26,17 +26,17 @@ export const Header = () => {
                         <Nav.Link href={"/"}>Home</Nav.Link>
                         <Nav.Link href='/about'>About</Nav.Link>
                         <NavDropdown title="Categories" id='basic-nav-dropdown' >
-                            <NavDropdown.Item href="#action/3.1">Healthy</NavDropdown.Item>
-                            <NavDropdown.Item href="#action/3.2">
+                            <NavDropdown.Item href="#healthy">Healthy</NavDropdown.Item>
+                            <NavDropdown.Item href="#dessarts">
                                 Dessarts
                             </NavDropdown.Item>
 
-                            <NavDropdown.Item href="#action/3.3">Sea Food</NavDropdown.Item>
-                            <NavDropdown.Item href="#action/3.1">Breads</NavDropdown.Item>
-                            <NavDropdown.Item href="#action/3.2">
-                                Vegetrains
+                            <NavDropdown.Item href="#seafood">Sea Food</NavDropdown.Item>
+                            <NavDropdown.Item href="#bakery">Bakery</NavDropdown.Item>
+                            <NavDropdown.Item href="#vegitarians">
+                                Vegitarians
                             </NavDropdown.Item>
-                            <NavDropdown.Item href="#action/3.3">Soups</NavDropdown.Item>
+                            <NavDropdown.Item href="#soups">Soups</NavDropdown.Item>
                         </NavDropdown>
                         <Nav.Link href='/contact'>Contact</Nav.Link>
                         <NavDropdown.Divider />

@@ -1,6 +1,11 @@
 import React from 'react';
 import { Modal, Button, Image, Row, Col } from 'react-bootstrap';
 import { MDBBtn } from 'mdb-react-ui-kit';
+import { toast } from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
+import {add ,remove} from "../../Redux/slices/cartSlice";
+
+
 
 function CardDetails(props) {
   console.log(props.props);
@@ -8,9 +13,22 @@ function CardDetails(props) {
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
+
+  const {cart} = useSelector((state) => state);
+  const dispatch = useDispatch();
+
+  const addToCart = () => {
+    dispatch(add(props.item));
+    toast.success("Item added to Cart");
+  }
+
+  const removeFromCart = () => {
+    dispatch(remove(props.item.id));
+    toast.error("Item removed from Cart");
+  }
   return (
     <>
-    <MDBBtn style={{ width: '5rem',height:'2.5rem' }} onClick={handleShow}outline>Order</MDBBtn>
+    <MDBBtn style={{ width: '5rem',height:'2.5rem' }} onClick={handleShow}outline className='mb-2'>Order</MDBBtn>
 
       <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
@@ -41,7 +59,7 @@ function CardDetails(props) {
           <Button variant="secondary" onClick={handleClose}>
             Close
           </Button>
-          <Button variant="primary" onClick={handleClose}>
+          <Button variant="primary" onClick={addToCart}>
             Add to Cart
           </Button>
         </Modal.Footer>

@@ -68,16 +68,21 @@ p a:hover {
   object-fit: cover;
 }
 .img2{
-  width: 100vw;
-  height:100vh;
+  width: 100%;
+  height:5rem;
 }
-.card-img-top {
+/* .card-img-top {
   background-image: url(./assets/food\ landing\ page.png);
   object-fit: cover;
   background-repeat: no-repeat;
 
   height: 20%;
   width: 100%;
+} */
+
+.Intro{
+  width: 350px;
+  height: 300px;
 }
 
 .bg {
@@ -169,3 +174,17 @@ p a:hover {
 .comment{
   font-size: 15px;
 }
+
+.team{
+  width: 100%;
+  height: 350px;
+  padding: 45px;
+  border-radius: 100%;
+  object-fit:fill;
+}
+
+.img3{
+  width: 400px;
+  height: 500px;
+}
+

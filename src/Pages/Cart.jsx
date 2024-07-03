@@ -24,6 +24,7 @@
 
 import React, { useState } from "react";
 import { Container, Row, Col, Card, Button, Form } from "react-bootstrap";
+import toast from "react-hot-toast";
 
 function Cart() {
   const [cartItems, setCartItems] = useState([
@@ -67,7 +68,7 @@ function Cart() {
 
   const handleOrderNow = () => {
     // Implement order now logic here
-    alert("Order placed successfully!");
+    toast.success('Order Successfully...');
   };
 
   return (

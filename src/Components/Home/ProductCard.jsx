@@ -13,24 +13,9 @@ import {
   MDBIcon
 } from 'mdb-react-ui-kit';
 import CardDetails from './CardDetails';
-import { toast } from "react-hot-toast";
-import { useDispatch, useSelector } from "react-redux";
-import {add ,remove} from "../../Redux/slices/cartSlice";
+
 
 export default function App(props) {
-
-  const {cart} = useSelector((state) => state);
-  const dispatch = useDispatch();
-
-  const addToCart = () => {
-    dispatch(add(props.item));
-    toast.success("Item added to Cart");
-  }
-
-  const removeFromCart = () => {
-    dispatch(remove(props.item.id));
-    toast.error("Item removed from Cart");
-  }
 
 
   const [readmore, setreadmore] = useState(false);
@@ -60,10 +45,10 @@ export default function App(props) {
                 <MDBCardTitle className='fs-6'>{props.item.heading}</MDBCardTitle>
               </MDBCol>
               <MDBCol className='d-flex justify-content-end mb-3'>
-                <MDBBadge className='bg-success'>{props.item.rating}</MDBBadge>
+                <MDBBadge className='bg-success mb-2'>{props.item.rating}</MDBBadge>
               </MDBCol>
             </MDBRow>
-            <MDBRow className=' p-1'>
+            <MDBRow className='p-1'>
               <MDBCol>
                 <MDBCardText className='comment'>{description}</MDBCardText>
               </MDBCol>
@@ -77,7 +62,7 @@ export default function App(props) {
                 </MDBCardText>
               </MDBCol>
             </MDBRow>
-            <MDBRow className='p-1 mt-1'>
+            <MDBRow className='p-1 '>
               <MDBCol >
 
                 <CardDetails props={props.item} />

@@ -7,7 +7,7 @@ const CardForReview = (props) => {
     return (
         <div>
             <Container>
-                <Card style={{ width: '23rem', height: '18rem',marginTop:'100px' }} className=''>
+                <Card style={{height: '18rem' }} className='shadow border mt-5 mb-5'>
                     <Card.Header className="d-flex justify-content-between align-items-center bg-white no-border">
                         <div className="d-flex align-items-center">
                             <Image
