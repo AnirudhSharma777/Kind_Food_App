@@ -1,25 +1,43 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Modal, Button, Image, Row, Col } from 'react-bootstrap';
 import { MDBBtn } from 'mdb-react-ui-kit';
 import { toast } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
-import {add ,remove} from "../../Redux/slices/cartSlice";
+import { add, remove } from "../../Redux/slices/cartSlice";
 
 
 
 function CardDetails(props) {
-  console.log(props.props);
+  // console.log(props.props);
   const [show, setShow] = React.useState(false);
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
-  const {cart} = useSelector((state) => state);
+  const { cart } = useSelector((state) => state);
   const dispatch = useDispatch();
 
+  const [item,setItem] = useState({
+    description:'',
+      genres:'',
+      heading:'',
+      image:'',
+      ingredients:'',
+      price:'',
+      rating:'',
+      time:''
+  })
+  const [quantity, setQuantity] = useState(1);
+  const [total,setTotal] = useState(0);
+
+  const handleOnchange = () => {
+    setTotal(quantity * item.price);
+    
+  }
+
   const addToCart = () => {
-    dispatch(add(props.item));
-    toast.success("Item added to Cart");
+    dispatch(add(item));
+    // toast.success("Item added to Cart");
   }
 
   const removeFromCart = () => {
@@ -28,7 +46,7 @@ function CardDetails(props) {
   }
   return (
     <>
-    <MDBBtn style={{ width: '5rem',height:'2.5rem' }} onClick={handleShow}outline className='mb-2'>Order</MDBBtn>
+      <MDBBtn style={{ width: '5rem', height: '2.5rem' }} onClick={handleShow} outline className='mb-2'>Order</MDBBtn>
 
       <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
@@ -47,7 +65,7 @@ function CardDetails(props) {
               <p><strong>Ingredients:</strong></p>
               <ul className='d-flex flex-wrap  gap-2 p-1 list-unstyled'>
                 {
-                  props.props.ingredients[0].map((item,id) => (
+                  props.props.ingredients[0].map((item, id) => (
                     <li key={id} className=''>{item}</li>
                   ))
                 }

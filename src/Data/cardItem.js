@@ -55,10 +55,10 @@ export const products = [
     },
     {
         id:2,
-        tag: 'Dasserts',
+        tag: 'Desserts',
         dishes : [
             {
-                heading : "Sweet Pinaple dishes",
+                heading : "Kheer",
                 description : "A refreshing dessert made with sweet, ripe pineapples.",
                 image:'https://media.istockphoto.com/id/978380954/photo/shrikhand-or-srikhand-is-an-indian-dessert-made-of-strained-yogurt-garnished-with-dry-fruits.webp?b=1&s=170667a&w=0&k=20&c=vZ_wqIX0gyQ0kFGioM4YOl5Eb6zfJfkIhhBcwz4K5Xs=',
                 price:' $8',

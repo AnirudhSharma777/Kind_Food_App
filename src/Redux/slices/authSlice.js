@@ -11,16 +11,18 @@ export const authSlice = createSlice({
     initialState:initialState,
     reducers :{
         setLoading :(state,value) =>{
-            state.value = value.payload;
+            state.loading = value.payload;
         },
         setToken :(state,value) =>{
-            state.value = value.payload;
+            state.token = value.payload;
         },
         setSignupData : (state,value) => {
-            state.value = value.payload;
+            state.signupData = value.payload;
+            // console.log(state.value);
         },
     }
 })
+
 
 export const {setToken, setLoading,setSignupData} = authSlice.actions;
 

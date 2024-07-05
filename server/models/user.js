@@ -16,7 +16,6 @@ const userSchema = new mongoose.Schema({
   },
   phoneNumber: {
     type: String,
-    required: true,
   },
   password: {
     type: String,
@@ -29,11 +28,12 @@ const userSchema = new mongoose.Schema({
   token:{
     type:String,
   },
-  // cart:[
-  //   {
-
-  //   }
-  // ],
+  cart:[
+    {
+      type:mongoose.Schema.Types.ObjectId,
+      ref:"Cart"
+    }
+  ],
 });
 
 const User = mongoose.model('User', userSchema);

@@ -10,6 +10,11 @@ import { useSelector} from 'react-redux';
 export const Header = () => {
 
     const {cart} = useSelector((state) => state);
+    const scrolHandler = (elmRef) => {
+        console.log(elmRef.current);
+        window.scrollTo({ top: elmRef.current.offsetTop, behavior: 'smooth' });
+    };
+
 
     return (
         <Navbar className='' expand="lg">
@@ -26,17 +31,17 @@ export const Header = () => {
                         <Nav.Link href={"/"}>Home</Nav.Link>
                         <Nav.Link href='/about'>About</Nav.Link>
                         <NavDropdown title="Categories" id='basic-nav-dropdown' >
-                            <NavDropdown.Item href="#healthy">Healthy</NavDropdown.Item>
-                            <NavDropdown.Item href="#dessarts">
+                            <NavDropdown.Item href="#healthy" onClick={() => scrolHandler()}>Healthy</NavDropdown.Item>
+                            <NavDropdown.Item href="#dessarts" onClick={() => scrolHandler()}>
                                 Dessarts
                             </NavDropdown.Item>
 
-                            <NavDropdown.Item href="#seafood">Sea Food</NavDropdown.Item>
-                            <NavDropdown.Item href="#bakery">Bakery</NavDropdown.Item>
-                            <NavDropdown.Item href="#vegitarians">
+                            <NavDropdown.Item href="#seafood" onClick={() => scrolHandler()}>Sea Food</NavDropdown.Item>
+                            <NavDropdown.Item href="#bakery" onClick={() => scrolHandler()}>Bakery</NavDropdown.Item>
+                            <NavDropdown.Item href="#vegitarians" onClick={() => scrolHandler()}>
                                 Vegitarians
                             </NavDropdown.Item>
-                            <NavDropdown.Item href="#soups">Soups</NavDropdown.Item>
+                            <NavDropdown.Item href="#soups" onClick={() => scrolHandler()}>Soups</NavDropdown.Item>
                         </NavDropdown>
                         <Nav.Link href='/contact'>Contact</Nav.Link>
                         <NavDropdown.Divider />

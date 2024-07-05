@@ -4,15 +4,15 @@ require('dotenv').config();
 
 exports.Signup = async (req, res) => {
   try {
-    const { firstName,lastName, email, phoneNumber, password, confirmPassword } = req.body;
+    const { firstName,lastName, email, password, confirmPassword } = req.body;
 
     if (
         !firstName ||
         !lastName ||
         !email ||
         !password ||
-        !confirmPassword ||
-        !phoneNumber
+        !confirmPassword
+        
     ) {
         return res.status(400).json({
             success: false,
@@ -38,7 +38,6 @@ exports.Signup = async (req, res) => {
       firstName,
       lastName,
       email,
-      phoneNumber,
       password: hashedPassword,
       confirmPassword: hashedPassword,
     });
@@ -48,7 +47,7 @@ exports.Signup = async (req, res) => {
     res.status(201).json({ message: 'User created successfully' });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
+    res.status(500).json({ message: 'User not created' });
   }
 };
 

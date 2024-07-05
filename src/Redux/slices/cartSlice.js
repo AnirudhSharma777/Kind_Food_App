@@ -21,11 +21,11 @@ export const cartSlice = createSlice({
             const course = action.payload;
             const index = state.cart.findIndex((item) => item._id === course._id)
 
-            if(index >= 0){
-                // if the course if already in the cart, do not modify the quantity
-                toast.error("Course already in cart");
-                return
-            }
+            // if(index >= 0){
+            //     // if the course if already in the cart, do not modify the quantity
+            //     toast.error("Course already in cart");
+            //     return
+            // }
 
             // if the course is not in the cart, add it to the cart 
             state.cart.push(course)
@@ -40,7 +40,7 @@ export const cartSlice = createSlice({
             localStorage.setItem("totalItems",JSON.stringify(state.totalItems));
 
             // show toast
-            toast.success("Course added to Cart");
+            toast.success("added to Cart");
         },
         remove:(state,action) =>{
             const course = action.payload;

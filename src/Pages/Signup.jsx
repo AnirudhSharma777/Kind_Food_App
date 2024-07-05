@@ -12,7 +12,7 @@ import { AiOutlineEyeInvisible, AiOutlineEye } from 'react-icons/ai';
 import { FaFacebookF, FaTwitter, FaInstagram, FaGoogle } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux'
-import { signup } from '../Services/operation/authApi';
+import { signUp, signup } from '../Services/operation/authApi';
 import { toast } from 'react-hot-toast';
 import { setSignupData } from '../Redux/slices/authSlice';
 
@@ -37,7 +37,7 @@ function Example() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const { firstName, lastName, email, password, confirmPassword, phoneNumber } = formData;
+  const { firstName, lastName, email, password, confirmPassword } = formData;
 
   // Handle input fields, when some value changes
   const handleOnChange = (e) => {
@@ -60,25 +60,25 @@ function Example() {
       ...formData,
     }
 
+    console.log("formdata -> ",signupData);
     // Setting signup data to state
     // To be used after otp verification
     dispatch(setSignupData(signupData))
+    dispatch(signUp(signupData))
 
-
-    // Reset
     setFormData({
       firstName: "",
       lastName: "",
       email: "",
       password: "",
       confirmPassword: "",
-      phoneNumber: "",
     })
-
   }
-
+  
+  // console.log(formData);
   return (
     <Container>
+
       <Button onClick={handleShow} variant="outline-primary">Signup</Button>
       <Modal
         show={show} onHide={handleClose}
@@ -124,7 +124,7 @@ function Example() {
                   />
                 </Form.Group>
 
-                <Form.Group controlId="phone" className="mb-3">
+                {/* <Form.Group controlId="phone" className="mb-3">
                   <Form.Label>Phone Number</Form.Label>
                   <Form.Control
                     type="tel"
@@ -133,10 +133,11 @@ function Example() {
                     onChange={handleOnChange}
                     placeholder="Enter phone number"
                   />
-                </Form.Group>
+                </Form.Group> */}
 
-                <Form.Group controlId="password" className="mb-3">
+                <Form.Group controlId="password" className="mb-3 ">
                   <Form.Label>Password</Form.Label>
+                  <div className='d-flex gap-2'>
                   <Form.Control
                     type={showPassword ? "text" : "password"}
                     value={password}
@@ -155,6 +156,7 @@ function Example() {
                         )
                     }
 
+                  </div>
                   </div>
                 </Form.Group>
 
