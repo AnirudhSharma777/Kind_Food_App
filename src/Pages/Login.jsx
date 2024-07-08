@@ -4,7 +4,9 @@ import { FaFacebookF, FaTwitter, FaInstagram, FaGoogle } from 'react-icons/fa';
 import {AiOutlineEyeInvisible, AiOutlineEye} from 'react-icons/ai';
 import {useNavigate} from 'react-router-dom';
 import {useDispatch} from 'react-redux'
-import  {login} from '../Services/operation/authApi'
+import  {SignIn} from '../Services/operation/authApi'
+import {setLoginData} from '../Redux/slices/authSlice'
+import toast from 'react-hot-toast';
 
 function Login() {
 
@@ -34,12 +36,21 @@ function Login() {
 
   const handleOnSubmit = (e) => {
     e.preventDefault();
-    dispatch(login(email,password, navigate));
+    dispatch(setLoginData(formData))
+    SignIn(formData).then(() =>{
+      toast.success('login successfully');
+      handleClose();
+      navigate('/');
+    }).catch((error) =>{
+      toast.error(error.response.data.message);
+    })
   }
+
+
 
   return (
     <Container >
-      <Button onClick={handleShow} variant="outline-primary" >SignIn</Button>
+      <Button onClick={handleShow} variant="outline-primary" className='shadow' >SignIn</Button>
       <Modal
        show={show} onHide={handleClose}
         className='back' closeButton
@@ -63,6 +74,7 @@ function Login() {
                 </Form.Group>
                 <Form.Group className="mb-3">
                   <Form.Label>Password</Form.Label>
+                  <div className='d-flex gap-2'>
                   <Form.Control
                     type={showPassword ? "text" : "password"}
                     placeholder="Enter your password"
@@ -70,15 +82,16 @@ function Login() {
                     name="password"
                     onChange={handleOnChange}
                   />
-                  <div >
+                  <div style={{position:'absolute', right:'30px',  }} onClick={() => setShowPassword((prev) => !prev)} >
                   {
-                    showPassword ? (
+                    !showPassword ? (
                       <AiOutlineEyeInvisible fontSize={24} fill="#AFB2BF" />
                     ) :
                       (
                         <AiOutlineEye fontSize={24} fill="#AFB2BF" />
                       )
                   }
+                  </div>
                   </div>
                 </Form.Group>
                 <Form.Group className="mb-3">

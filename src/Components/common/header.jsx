@@ -1,21 +1,34 @@
 import React from 'react'
-import { Navbar, Nav, Container, NavDropdown } from 'react-bootstrap';
+import { Navbar, Nav, Container, NavDropdown,Button } from 'react-bootstrap';
 import logo from '../../assets/logo.png'
 import Signup from '../../Pages/Signup'
 import Login from '../../Pages/Login'
 import { FaShoppingCart } from "react-icons/fa"
 import { MDBBadge } from 'mdb-react-ui-kit';
-import { useSelector} from 'react-redux';
+import { useSelector } from 'react-redux';
+import { logout } from '../../Services/operation/authApi';
+import toast from 'react-hot-toast';
+import {useNavigate} from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 
 export const Header = () => {
 
-    const {cart} = useSelector((state) => state);
+    const navigate = useNavigate();
+    const {cart} = useSelector((state) => state.cart);
     const scrolHandler = (elmRef) => {
         console.log(elmRef.current);
         window.scrollTo({ top: elmRef.current.offsetTop, behavior: 'smooth' });
     };
 
+    const { token } = useSelector((state) => state.auth);
 
+    const handleOnLogout = () => {
+        logout(navigate).then(() =>{
+            toast.success('LogOut successfully')
+        }).catch((e) =>{
+            toast.error('LogOut failed');
+        })
+    }
     return (
         <Navbar className='' expand="lg">
             <Container fluid className='d-flex  justify-content-lg-between align-item-center'>
@@ -46,18 +59,32 @@ export const Header = () => {
                         <Nav.Link href='/contact'>Contact</Nav.Link>
                         <NavDropdown.Divider />
 
-                        
+
                         <div className='d-flex gap-3 me-3'>
-                        <Nav.Link eventKey="link-event-key" href='/carts'>
-                            <div>
-                                <FaShoppingCart className='fs-4 mb-2' />
-                                <MDBBadge color='primary'  className='position-absolute translate-middle z-3'>
-                                    {cart.length}
-                                </MDBBadge>
-                            </div>
-                        </Nav.Link>
-                            <Signup />
-                            <Login />
+                            <Nav.Link eventKey="link-event-key" href='/carts'>
+                                <div>
+                                    <FaShoppingCart className='fs-4 mb-2' />
+                                    <MDBBadge color='primary' className='position-absolute translate-middle z-3'>
+                                        {cart?.length}
+                                    </MDBBadge>
+                                </div>
+                            </Nav.Link>
+                            {
+                                token === null && (
+                                    <>
+                                        <Signup />
+                                        <Login />
+                                    </>
+                                )
+                            }
+                             {
+                                token !== null && (
+                                    <div className='d-flex gap-2'>
+                                        <Button href='/dashboard' className='shadow mb-3'>Dashboard</Button>
+                                        {/* <Button className='shadow' onClick={handleOnLogout}>LogOut</Button> */}
+                                    </div>
+                            )
+                            }
                         </div>
                     </Nav>
 

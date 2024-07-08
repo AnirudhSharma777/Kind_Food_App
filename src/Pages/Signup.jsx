@@ -12,7 +12,7 @@ import { AiOutlineEyeInvisible, AiOutlineEye } from 'react-icons/ai';
 import { FaFacebookF, FaTwitter, FaInstagram, FaGoogle } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux'
-import { signUp, signup } from '../Services/operation/authApi';
+import { SignUp } from '../Services/operation/authApi';
 import { toast } from 'react-hot-toast';
 import { setSignupData } from '../Redux/slices/authSlice';
 
@@ -64,8 +64,8 @@ function Example() {
     // Setting signup data to state
     // To be used after otp verification
     dispatch(setSignupData(signupData))
-    dispatch(signUp(signupData))
-
+    SignUp(formData,navigate);
+    handleClose();
     setFormData({
       firstName: "",
       lastName: "",
@@ -79,7 +79,7 @@ function Example() {
   return (
     <Container>
 
-      <Button onClick={handleShow} variant="outline-primary">Signup</Button>
+      <Button onClick={handleShow} variant="outline-primary" className='shadow'>Signup</Button>
       <Modal
         show={show} onHide={handleClose}
         className='back' closeButton
@@ -145,10 +145,10 @@ function Example() {
                     onChange={handleOnChange}
                     placeholder="Enter password"
                   />
-                  <div onClick={() => setShowPassword((prev) => !prev)}>
+                  <div onClick={() => setShowPassword((prev) => !prev)} style={{position:'absolute', right:'30px',  }}>
 
                     {
-                      showPassword ? (
+                      !showPassword ? (
                         <AiOutlineEyeInvisible fontSize={24} fill="#AFB2BF" />
                       ) :
                         (
@@ -162,6 +162,7 @@ function Example() {
 
                 <Form.Group controlId="confirmPassword" className="mb-3">
                   <Form.Label>Confirm Password</Form.Label>
+                  <div className='d-flex gap-2'>
                   <Form.Control
                     type={showConfirmPassword ? "text" : "password"}
                     value={confirmPassword}
@@ -169,10 +170,10 @@ function Example() {
                     onChange={handleOnChange}
                     placeholder="Enter password"
                   />
-                  <div onClick={() => setShowConfirmPassword((prev) => !prev)}>
+                  <div onClick={() => setShowConfirmPassword((prev) => !prev)} style={{position:'absolute', right:'30px',  }}>
 
                     {
-                      showConfirmPassword ? (
+                      !showConfirmPassword ? (
                         <AiOutlineEyeInvisible fontSize={24} fill="#AFB2BF" />
                       ) :
                         (
@@ -180,6 +181,7 @@ function Example() {
                         )
                     }
 
+                  </div>
                   </div>
                 </Form.Group>
                 <Button type="submit" variant="primary" block >
