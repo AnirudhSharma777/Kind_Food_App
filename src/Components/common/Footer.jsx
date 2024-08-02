@@ -73,7 +73,7 @@ const Footer = () => {
 
         <Row>
           <div className="lastItem">
-            <p>&#169; All rights reserved. Made ❤️ By Anirudh & Bhumika</p>
+            <p>&#169; All rights reserved. Made ❤️ By Anirudh Sharma</p>
 
           </div>
         </Row>
