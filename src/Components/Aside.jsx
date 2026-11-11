@@ -27,9 +27,9 @@ function Aside() {
   ];
 
   return (
-    <aside className=" py-3">
+    <aside className="recipe-sidebar py-3">
       <Container>
-        <ListGroup>
+        <ListGroup className="ingredient-list">
           <ListGroup.Item>
             <span className="me-2">
               <i className="bi bi-apple"></i>
@@ -147,7 +147,7 @@ function Aside() {
             </span>
           </ListGroup.Item>
         </ListGroup>
-        <h2 className="mt-3">Popular Recipes</h2>
+        <h3 className="recipe-sidebar-title mt-4">Popular recipes</h3>
         <Row  className="g-3 d-flex flex-row">
           {recipes.map((recipe, index) => (
            <Col key={index} className="w-100">
@@ -166,7 +166,7 @@ function Aside() {
          </Col>
           ))}
         </Row>
-        <h2 className="mb-4 mt-5">Popular tags</h2>
+        <h3 className="recipe-sidebar-title mb-3 mt-4">Popular tags</h3>
         <Row className=" ">
           <Col xs={6} md={6} lg={3} className="d-flex flex-wrap w-100 gap-3">
             <Badge className=" mb-3">
@@ -201,7 +201,7 @@ function Aside() {
             </Badge>
           </Col>
         </Row>
-        <h2 className="mb-4 mt-4">Follow me</h2>
+        <h3 className="recipe-sidebar-title mb-3 mt-4">Follow us</h3>
         <div className="social-media">
           <Button variant="outline-primary" className="me-2">
             <FaFacebookF />

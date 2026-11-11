@@ -10,15 +10,16 @@ function subCard() {
         {recipeCardData.map((item) => (
           <Card
             key={item.id}
-            className="mt-3 container-fluid d-flex flex-lg-row flex-xxl-row flex-sm-column "
+            id={item.category === 'Bakery' ? 'bakery' : item.category === 'Vegetarian' ? 'vegetarian' : undefined}
+            className="recipe-card container-fluid d-flex flex-lg-row flex-column"
           >
-            <Col md={3}>
-              <Card.Img src={item.image} alt="..." className="mt-3 mb-3" />
+            <Col md={4} lg={3}>
+              <Card.Img src={item.image} alt={item.title} className="recipe-image" />
             </Col>
-            <Col md={6}>
+            <Col md={8} lg={9}>
               <Card.Body>
                 <Card.Title>
-                  <Badge bg="success" className="me-2">
+                  <Badge className="rating-badge me-2">
                     {item.category}
                   </Badge>
                   {item.title}

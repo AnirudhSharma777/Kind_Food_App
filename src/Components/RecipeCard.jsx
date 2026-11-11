@@ -6,13 +6,14 @@ import SubCard from './subCard';
 function RecipeCard() {
   return (
     <Container>
-      <Row>
+      <Row className='recipe-layout'>
         <Col md={9} className='mt-3'>
-        <h2>Posts</h2>
+        <span className='eyebrow'>Fresh from the kitchen</span>
+        <h2 className='section-heading fs-3'>Recipes & ideas</h2>
         <SubCard/>
         </Col>
         <Col md={3} className='mt-3'>
-        <h2>Ingredients</h2>
+        <h2 className='recipe-sidebar-title'>Browse ingredients</h2>
         <Aside/>
         </Col>
       </Row>

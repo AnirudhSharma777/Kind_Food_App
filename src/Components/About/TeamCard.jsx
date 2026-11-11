@@ -1,45 +1,40 @@
-import React, { useState } from "react";
-import { Carousel } from "react-bootstrap";
+import React from "react";
 import { AboutUsData } from "../../Data/AboutUs";
 
 function TeamCard() {
-  const [index, setIndex] = useState(0);
-
-  const handleSelect = (selectedIndex, e) => {
-    setIndex(selectedIndex);
-  };
-
   return (
-    <div className="container mt-5 mb-5 d-flex flex-column justify-content-center align-items-center">
-      <h1 className="text-primary text-center mt-5">Our Amazing Team</h1>
-      <Carousel
-        activeIndex={index}
-        onSelect={handleSelect}
-        className="d-flex justify-content-center align-items-center img3 mt-5"
-      >
-        {AboutUsData.map((item, id) => {
-          return (
-            <Carousel.Item>
-              <img
-                className=" img3"
-                src={item.image}
-                alt="First slide"
-              />
-              <Carousel.Caption >
-            <h3>{item.developerName}</h3>
-            <strong>{item.designation}</strong>
-            <p>
-              {item.discription}
-            </p>
-          </Carousel.Caption>
-            </Carousel.Item>
-          );
-        })}
-      </Carousel>
-    </div>
+    <section className="team-section">
+      <div className="container">
+        <div className="text-center team-heading">
+          <span className="eyebrow">The people behind every plate</span>
+          <h2 className="section-heading">Meet our team</h2>
+          <p className="section-intro">A small team with a big appetite for making good food feel special.</p>
+        </div>
+        <div className="team-grid">
+          {AboutUsData.map((person, index) => (
+            <article className={`team-member-card team-member-card-${index % 4}`} key={person.id}>
+              <div className="team-member-avatar" aria-hidden="true">
+                <span>{person.developerName.split(" ").map((part) => part[0]).join("")}</span>
+                {person.image && (
+                  <img
+                    src={person.image}
+                    alt=""
+                    loading="lazy"
+                    onError={(event) => { event.currentTarget.style.display = "none"; }}
+                  />
+                )}
+              </div>
+              <div className="team-member-copy">
+                <span className="team-member-role">{person.designation}</span>
+                <h3>{person.developerName}</h3>
+                <p>{person.discription}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
 
 export default TeamCard;
-
-

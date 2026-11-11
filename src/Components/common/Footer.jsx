@@ -6,79 +6,58 @@ import { Link } from 'react-router-dom';
 
 const Footer = () => {
   return (
-    <div className="footer border-top ">
-      <Container fluid className='bg-light'>
-        <Row className='mb-4'>
-          <Col className="col-12 col-md-4 mt-3 p-2" >
-            <div className="container-fluid d-flex align-items-center">
-              <Link to={'/'} className='d-flex justify-content-center align-items-center'>
-              <img src={logo} alt="" srcset="" width={50} />
-              <h2 className='text-primary mt-2 text-decoration-none'>FOOD</h2>
-              </Link>
-            </div>
-            <p style={{ margin: '20px' }} className='fs-5'>Follow</p>
-            
-              <div className="social-media ms-4">
-                <Button variant="outline-primary" className="me-2">
-                  <FaFacebookF />
-                </Button>
-                <Button variant="outline-info" className="me-2">
-                  <FaTwitter />
-                </Button>
-
-
-                <Button variant="outline-danger" className="me-2">
-                  <FaInstagram />
-                </Button>
-                <Button variant="outline-secondary">
-                  <FaGoogle />
-                </Button>
-              </div>
-            
-          </Col>
-
-          <Col className="col-12 col-md-3 d-flex gap-5 mt-3 ms-2 p-2" >
-            <div>
-              <h5 style={{ color: '#1585fd' }}>Pages</h5>
-              <div className="d-flex flex-column">
-              <a href='#products'>Products</a>
-                <Link to={"/about"}>
-                <span>About Us</span>
-                </Link>
-                <Link to={"/contact"}> <span>Contacts</span>
-                </Link> </div>
-            </div>
-
-            <div> <h5 style={{ color: '#1585fd' }}>Terms & Condition</h5>
-              <div className="d-flex flex-column">
-                <Link to={"/cooperation"}>Leagal Actions</Link>
-                <Link to={"/policy"}>Policy</Link>
-              </div>
-
+    <footer className="site-footer">
+      <Container>
+        <Row className='g-4'>
+          <Col xs={12} md={5} lg={4}>
+            <Link to='/' className='brand-lockup d-inline-flex text-decoration-none'>
+              <img src={logo} alt="" />
+              <span>Food</span>
+            </Link>
+            <p className='mt-3 mb-3'>Good food, thoughtfully made. Find your next favorite and enjoy it at home.</p>
+            <div className="d-flex gap-2">
+              <Button variant="outline-secondary" className="social-link" aria-label="Facebook"><FaFacebookF /></Button>
+              <Button variant="outline-secondary" className="social-link" aria-label="Twitter"><FaTwitter /></Button>
+              <Button variant="outline-secondary" className="social-link" aria-label="Instagram"><FaInstagram /></Button>
+              <Button variant="outline-secondary" className="social-link" aria-label="Google"><FaGoogle /></Button>
             </div>
           </Col>
 
-          <Col className="col-12 col-md-4 mt-3 p-2 gap-3">
-            <p className='fs-4'>Subscribe and never miss a post!</p>
-            <div class="input-group mb-3">
-              <Form className='d-flex mb-2 gap-2'>
-                <Form.Control type="text" placeholder="Your email..." />
-                <Button variant="primary" className='text-white rounded'>Subscribe</Button>
-              </Form>
-
-              <p className='p-1'>*Subscribe to our newsletter to receive early discount offer, updates and new product info.</p>
+          <Col xs={6} md={3} lg={2}>
+            <h5>Explore</h5>
+            <div className="footer-links">
+              <Link to='/'>Home</Link>
+              <a href='/#products'>Menu</a>
+              <Link to='/about'>About us</Link>
+              <Link to='/contact'>Contact</Link>
+              <Link to='/faq'>Help & FAQ</Link>
             </div>
+          </Col>
+
+          <Col xs={6} md={4} lg={2}>
+            <h5>Information</h5>
+            <div className="footer-links">
+              <Link to='/cooperation'>Legal actions</Link>
+              <Link to='/policy'>Privacy policy</Link>
+            </div>
+          </Col>
+
+          <Col xs={12} lg={4}>
+            <h5>Stay in the know</h5>
+            <p className='mb-3'>Get occasional updates, new dishes, and early offers.</p>
+            <Form className='newsletter-form'>
+              <Form.Control type="email" placeholder="Your email address" aria-label="Your email address" />
+              <Button variant="primary" type="submit">Subscribe</Button>
+            </Form>
           </Col>
         </Row>
 
-        <Row>
-          <div className="lastItem">
-            <p>&#169; All rights reserved.</p>
-
-          </div>
-        </Row>
+        <div className="footer-bottom d-flex flex-column flex-sm-row justify-content-between gap-2">
+          <span>© {new Date().getFullYear()} King Food. All rights reserved.</span>
+          <span>Made for good meals and better moments.</span>
+        </div>
       </Container>
-    </div>
+    </footer>
   )
 }
 

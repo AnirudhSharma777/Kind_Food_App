@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 // Import Swiper React components
 import { Swiper, SwiperSlide } from 'swiper/react';
 
@@ -26,9 +26,8 @@ const MainSlider = () => {
   };
 
   return (
-    <>
+    <div className="hero-wrap">
       <Swiper
-        
         spaceBetween={30}
         centeredSlides={true}
         autoplay={{
@@ -41,12 +40,12 @@ const MainSlider = () => {
         navigation={true}
         modules={[Autoplay, Pagination, Navigation]}
         onAutoplayTimeLeft={onAutoplayTimeLeft}
-        className="mySwiper"
+        className="hero-slider"
       >
         {
           [first, third,fourth,second].map((item, id) => (
             <SwiperSlide key={id}>
-              <video autoPlay muted loop className="d-block w-100 " src={item} alt="first" />
+              <video autoPlay muted loop playsInline className="hero-video" src={item} aria-label="Freshly prepared food" />
             </SwiperSlide>
           ))
         }
@@ -57,7 +56,13 @@ const MainSlider = () => {
           <span ref={progressContent}></span>
         </div>
       </Swiper>
-    </>
+      <div className="hero-copy">
+        <span className="eyebrow">Good food, good mood</span>
+        <h1>Fresh flavors.<br />Made for sharing.</h1>
+        <p>Discover delicious meals made with care, delivered right to your table.</p>
+        <a className="btn btn-primary px-4 py-2" href="#products">Explore the menu</a>
+      </div>
+    </div>
   );
 }
 

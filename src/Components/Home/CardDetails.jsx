@@ -1,84 +1,81 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Modal, Button, Image, Row, Col } from 'react-bootstrap';
-import { MDBBtn } from 'mdb-react-ui-kit';
-import { toast } from "react-hot-toast";
-import { useDispatch, useSelector } from "react-redux";
-import { add, remove } from "../../Redux/slices/cartSlice";
-
-
+import { useDispatch } from "react-redux";
+import { FaClock, FaLeaf, FaStar } from 'react-icons/fa';
+import { add } from "../../Redux/slices/cartSlice";
 
 function CardDetails(props) {
-  // console.log(props.props);
   const [show, setShow] = React.useState(false);
-
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
-
-  const { cart } = useSelector((state) => state);
   const dispatch = useDispatch();
-
-  const [item,setItem] = useState({
-    description:'',
-      genres:'',
-      heading:'',
-      image:'',
-      ingredients:'',
-      price:'',
-      rating:'',
-      time:''
-  })
-  const [quantity, setQuantity] = useState(1);
-  const [total,setTotal] = useState(0);
-
-  const handleOnchange = () => {
-    setTotal(quantity * item.price);
-    
-  }
+  const product = props.props;
+  const ingredients = Array.isArray(product.ingredients?.[0]) ? product.ingredients[0] : [];
 
   const addToCart = () => {
-    dispatch(add(item));
-    // toast.success("Item added to Cart");
+    const productId = product._id || product.id || product.heading.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-");
+    dispatch(add({ ...product, _id: productId }));
+    handleClose();
   }
 
-  const removeFromCart = () => {
-    dispatch(remove(props.item.id));
-    toast.error("Item removed from Cart");
-  }
   return (
     <>
-      <MDBBtn style={{ width: '5rem', height: '2.5rem' }} onClick={handleShow} outline className='mb-2'>Order</MDBBtn>
+      <Button variant="primary" onClick={handleShow} className='product-details-trigger'>
+        View dish details <span aria-hidden='true'>↗</span>
+      </Button>
 
-      <Modal show={show} onHide={handleClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>{`Card Details`}</Modal.Title>
+      <Modal
+        show={show}
+        onHide={handleClose}
+        aria-labelledby="food-details-title"
+        centered
+        size="lg"
+        dialogClassName="food-detail-dialog"
+      >
+        <Modal.Header closeButton className='food-detail-header'>
+          <div>
+            <span className='food-detail-kicker'>Fresh from our menu</span>
+            <Modal.Title id="food-details-title">A closer look</Modal.Title>
+          </div>
         </Modal.Header>
-        <Modal.Body>
-          <Row>
-            <Col md={4}>
-              <Image src={props.props.image} alt="Image" fluid />
+        <Modal.Body className='food-detail-body'>
+          <Row className='g-4 align-items-center'>
+            <Col xs={12} md={5}>
+              <div className='food-detail-image-wrap'>
+                <Image src={product.image} alt={product.heading} fluid className="detail-image" />
+                <span className='food-detail-category'>{props.category || 'From our kitchen'}</span>
+              </div>
             </Col>
-            <Col md={8}>
-              <h4>{props.props.heading}</h4>
-              <p><strong>Price: </strong><span className='text-warning'>{props.props.price}</span></p>
-              <p><strong>Genres: </strong>{props.props.genres}</p>
-              <p> <strong>Description: </strong><span>{props.props.description}</span></p>
-              <p><strong>Ingredients:</strong></p>
-              <ul className='d-flex flex-wrap  gap-2 p-1 list-unstyled'>
-                {
-                  props.props.ingredients[0].map((item, id) => (
-                    <li key={id} className=''>{item}</li>
-                  ))
-                }
-              </ul>
+            <Col xs={12} md={7} className='food-detail-copy'>
+              <div className='food-detail-meta'>
+                <span><FaStar aria-hidden='true' /> {product.rating}</span>
+                <span><FaClock aria-hidden='true' /> {product.time}</span>
+              </div>
+              <h2>{product.heading}</h2>
+              <p className='food-detail-description'>{product.description}</p>
+              <div className='food-detail-price'>{product.price}</div>
+              {product.genres && <p className='food-detail-genres'>{product.genres}</p>}
+              <div className='food-detail-ingredients'>
+                <h3><FaLeaf aria-hidden='true' /> What goes into it</h3>
+                {ingredients.length > 0 ? (
+                  <ul>
+                    {ingredients.map((item, id) => (
+                      <li key={`${item}-${id}`}>{item}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className='food-detail-no-ingredients'>Ingredient details are coming soon.</p>
+                )}
+              </div>
             </Col>
           </Row>
         </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Close
+        <Modal.Footer className='food-detail-footer'>
+          <Button variant="outline-secondary" onClick={handleClose}>
+            Keep browsing
           </Button>
           <Button variant="primary" onClick={addToCart}>
-            Add to Cart
+            Add to cart <span aria-hidden='true'>+</span>
           </Button>
         </Modal.Footer>
       </Modal>
