@@ -21,15 +21,15 @@ const products = () => {
         },
         {
             id: 2,
-            title: "Dessarts",
+            title: "Desserts",
             image: img2,
-            link:'#dessart'
+            link:'#desserts'
         },
         {
             id: 3,
-            title: "Vegitarians",
+            title: "Vegetarian",
             image: img3,
-            link:'#vegitarians'
+            link:'#vegetarian'
         },
         {
             id: 4,
@@ -39,41 +39,44 @@ const products = () => {
         },
         {
             id: 5,
-            title: 'Sea-Food',
+            title: 'Seafood',
             image: img5,
-            link:'#seafood'
+            link:'#sea-food'
         },
         {
             id: 6,
             title: "Soups",
             image: img6,
-            link:'#soup'
+            link:'#soups'
         },
     ]
     return (
         <div >
-            <Container fluid>
+            <Container className='promo-categories'>
                 <Row>
-                    <h2 className="h1 mb-4 pb-3 text-center">Popular categories</h2>
-                    <Col className="pb-4 d-flex justify-content-evenly flex-wrap gap-5" data-simplebar data-simplebar-auto-hide="false">
+                    <div className='text-center mb-4'>
+                        <span className='eyebrow'>Find your favorite</span>
+                        <h2 className="section-heading">Popular categories</h2>
+                    </div>
+                    <Col className="pb-4">
+                        <div className='category-list'>
                         {
                             category.map((item,id) => {
                                 return (
-                                    <p className='d-flex flex-row gap-2' key={id}>
-                                        <a href={item.link} className='d-flex flex-column justify-content-center'>
+                                    <a className='category-link' key={id} href={item.link}>
                                             <img className='img' src={item.image} alt="category" />
-                                            <span className='ms-3'>{item.title}</span>
-                                        </a>
-                                    </p>
+                                            <span>{item.title}</span>
+                                    </a>
                                 )
                             })
                         }
+                        </div>
                     </Col>
 
                 </Row>
             </Container>
             <div className='mt-5 mb-4'>
-                <Container fuild>
+                <Container fluid>
                     <RecipeCard />
                 </Container>
             </div>

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React from 'react';
 // Import Swiper React components
 import { Swiper, SwiperSlide } from 'swiper/react';
 
@@ -21,58 +21,38 @@ import img6 from '../../assets/upper6.jpg'
 
 
 //Card
-import {
-    MDBCard,
-    MDBCardBody,
-    MDBCardText,
-    MDBCardImage
-} from 'mdb-react-ui-kit';
-
-
 const ImageSlider = () => {
     return (
-        <Container fluid className='bg-white mb-5' >
-            <h2 className='text-center p-5'>Follow <a href='/about' className='text-primary '>@KING-fOOD </a>on Instagram</h2>
-            <Swiper
-                // breakpoints={{
-                //     576: {
-                //         // width: 576,
-                //         slidesPerView: 1,
-                //     },
-                //     768: {
-                //         // width: 768,
-                //         slidesPerView: 2,
-                //     },
-                //     1000:{
-                //         // width:1000,
-                //         slidesPerView:3
-                //     }
-                // }}
-                slidesPerView={1}
-                spaceBetween={30}
-                pagination={{
-                    clickable: true,
-                }}
-                modules={[Pagination]}
-                className="mySwiper "
-            >
-                {
-                    [img1, img2, img3, img4, img5, img6].map((item, id) => (
-                        <SwiperSlide key={id} slidesPerView={1}>
-                            <MDBCard className='d-flex flex-wrap'>
-                                <MDBCardImage src={item} alt='...' position='top' />
-                                <MDBCardBody>
-                                    <MDBCardText className='fs-6'>
-                                        Some quick example text to build on the card title and make up the bulk of the card's content.
-                                    </MDBCardText>
-                                </MDBCardBody>
-                            </MDBCard>
-                        </SwiperSlide>
-                    ))
-                }
-            </Swiper>
-        </Container>
-    )
+        <section className='instagram-section'>
+            <Container>
+                <div className='text-center mb-4'>
+                    <span className='eyebrow'>From our kitchen</span>
+                    <h2 className='section-heading'>A little inspiration for your next bite</h2>
+                </div>
+                <Swiper
+                    slidesPerView={1}
+                    spaceBetween={16}
+                    breakpoints={{
+                        576: { slidesPerView: 2 },
+                        900: { slidesPerView: 3 },
+                    }}
+                    pagination={{
+                        clickable: true,
+                    }}
+                    modules={[Pagination]}
+                    className="instagram-slider"
+                >
+                    {
+                        [img1, img2, img3, img4, img5, img6].map((item, id) => (
+                            <SwiperSlide key={id}>
+                                <img src={item} alt={`Food inspiration ${id + 1}`} className='instagram-image' />
+                            </SwiperSlide>
+                        ))
+                    }
+                </Swiper>
+            </Container>
+        </section>
+        )
 }
 
 export default ImageSlider

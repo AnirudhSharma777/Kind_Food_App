@@ -4,19 +4,24 @@ const Status = () => {
 
 
   return (
-    <div className='bg-light p-2'>
-        <div className='mt-4 h-25'></div>
-        <div className='d-flex justify-content-evenly align-items-center flex-wrap '>
+    <section className='about-values'>
+        <div className='container'>
+            <div className='text-center mb-4'>
+                <span className='eyebrow'>The good stuff</span>
+                <h2 className='section-heading'>A few things we believe in</h2>
+            </div>
+            <div className='about-stats'>
             {
                 achivements.map((item) => (
-                    <div className='d-flex flex-column align-items-center gap-2' key={item.id}>
-                        <h4 className='text-primary text-hover'>{item.value}</h4>
+                    <div className='stat-item' key={item.id}>
+                        <span className='stat-number'>{item.value}</span>
                         <p>{item.name}</p>
                     </div>
                 ))
             }
+            </div>
         </div>
-    </div>
+    </section>
   )
 }
 

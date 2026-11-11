@@ -1,8 +1,5 @@
 import { useState } from 'react';
 import {
-  Container,
-  Row,
-  Col,
   Form,
   Button,
   Modal,
@@ -16,11 +13,7 @@ import { SignUp } from '../Services/operation/authApi';
 import { toast } from 'react-hot-toast';
 import { setSignupData } from '../Redux/slices/authSlice';
 
-function Example() {
-  const [show, setShow] = useState(false);
-
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
+function Signup({ open, onOpen, onClose, onSwitchToLogin }) {
 
 
   const navigate = useNavigate();
@@ -65,7 +58,7 @@ function Example() {
     // To be used after otp verification
     dispatch(setSignupData(signupData))
     SignUp(formData,navigate);
-    handleClose();
+    onClose();
     setFormData({
       firstName: "",
       lastName: "",
@@ -77,20 +70,17 @@ function Example() {
   
   // console.log(formData);
   return (
-    <Container>
-
-      <Button onClick={handleShow} variant="outline-primary" className='shadow'>Signup</Button>
+    <>
+      <Button onClick={onOpen} variant="outline-primary" size="sm">Sign up</Button>
       <Modal
-        show={show} onHide={handleClose}
-        className='back' closeButton
+        show={open} onHide={onClose}
+        aria-labelledby="sign-up-title"
       >
         <Modal.Header closeButton>
-          <h2 >Sign Up</h2>
+          <Modal.Title id="sign-up-title">Create your account</Modal.Title>
         </Modal.Header>
-        <Row className="justify-content-center">
-          <Col>
-            <ModalBody>
-
+        <ModalBody>
+              <p className="text-muted mb-4">A few details and you’ll be ready to order.</p>
               <Form onSubmit={handleOnSubmit}>
                 <Form.Group controlId="firstName" className="mb-3">
                   <Form.Label>First Name</Form.Label>
@@ -135,9 +125,9 @@ function Example() {
                   />
                 </Form.Group> */}
 
-                <Form.Group controlId="password" className="mb-3 ">
+                <Form.Group controlId="password" className="mb-3">
                   <Form.Label>Password</Form.Label>
-                  <div className='d-flex gap-2'>
+                  <div className='password-field'>
                   <Form.Control
                     type={showPassword ? "text" : "password"}
                     value={password}
@@ -145,7 +135,7 @@ function Example() {
                     onChange={handleOnChange}
                     placeholder="Enter password"
                   />
-                  <div onClick={() => setShowPassword((prev) => !prev)} style={{position:'absolute', right:'30px',  }}>
+                  <button type="button" className="password-toggle" aria-label={showPassword ? "Hide password" : "Show password"} onClick={() => setShowPassword((prev) => !prev)}>
 
                     {
                       !showPassword ? (
@@ -156,13 +146,13 @@ function Example() {
                         )
                     }
 
-                  </div>
+                  </button>
                   </div>
                 </Form.Group>
 
                 <Form.Group controlId="confirmPassword" className="mb-3">
                   <Form.Label>Confirm Password</Form.Label>
-                  <div className='d-flex gap-2'>
+                  <div className='password-field'>
                   <Form.Control
                     type={showConfirmPassword ? "text" : "password"}
                     value={confirmPassword}
@@ -170,7 +160,7 @@ function Example() {
                     onChange={handleOnChange}
                     placeholder="Enter password"
                   />
-                  <div onClick={() => setShowConfirmPassword((prev) => !prev)} style={{position:'absolute', right:'30px',  }}>
+                  <button type="button" className="password-toggle" aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"} onClick={() => setShowConfirmPassword((prev) => !prev)}>
 
                     {
                       !showConfirmPassword ? (
@@ -181,10 +171,10 @@ function Example() {
                         )
                     }
 
-                  </div>
+                  </button>
                   </div>
                 </Form.Group>
-                <Button type="submit" variant="primary" block >
+                <Button type="submit" variant="primary" className="w-100">
                   Sign Up
                 </Button>
               </Form>
@@ -194,7 +184,7 @@ function Example() {
                   {/* <Link to={<Login/>}>
                   SignUp
                   </Link> */}
-                  <a href="#">Login</a>
+                  <button type="button" className="btn btn-link p-0 align-baseline" onClick={onSwitchToLogin}>Sign in</button>
                 </p>
 
                 <div className="social-media mt-2">
@@ -212,13 +202,10 @@ function Example() {
                   </Button>
                 </div>
               </div>
-            </ModalBody>
-          </Col>
-        </Row>
-
+        </ModalBody>
       </Modal>
-    </Container>
+    </>
   );
 }
 
-export default Example;
+export default Signup;

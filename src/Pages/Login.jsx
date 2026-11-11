@@ -1,19 +1,14 @@
 import React, { useState } from 'react';
-import { Container, Row, Col, Form, Button, Modal, ModalBody } from 'react-bootstrap';
+import { Form, Button, Modal, ModalBody } from 'react-bootstrap';
 import { FaFacebookF, FaTwitter, FaInstagram, FaGoogle } from 'react-icons/fa';
 import {AiOutlineEyeInvisible, AiOutlineEye} from 'react-icons/ai';
-import {useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {useDispatch} from 'react-redux'
 import  {SignIn} from '../Services/operation/authApi'
 import {setLoginData} from '../Redux/slices/authSlice'
 import toast from 'react-hot-toast';
 
-function Login() {
-
-  const [show, setShow] = useState(false);
-
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
+function Login({ open, onOpen, onClose, onSwitchToSignup }) {
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -39,7 +34,7 @@ function Login() {
     dispatch(setLoginData(formData))
     SignIn(formData).then(() =>{
       toast.success('login successfully');
-      handleClose();
+      onClose();
       navigate('/');
     }).catch((error) =>{
       toast.error(error.response.data.message);
@@ -49,20 +44,19 @@ function Login() {
 
 
   return (
-    <Container >
-      <Button onClick={handleShow} variant="outline-primary" className='shadow' >SignIn</Button>
-      <Modal
-       show={show} onHide={handleClose}
-        className='back' closeButton
-      >
-        <Modal.Header closeButton>
-          <h2 >Sign In</h2>
-        </Modal.Header>
-        <Row className="justify-content-center">
-          <Col>
-            <ModalBody>
-              <Form onSubmit={handleOnSubmit}>
-                <Form.Group className="mb-3">
+    <>
+    <Button onClick={onOpen} variant="outline-primary" size="sm">Sign in</Button>
+    <Modal
+      show={open} onHide={onClose}
+      aria-labelledby="sign-in-title"
+    >
+      <Modal.Header closeButton>
+        <Modal.Title id="sign-in-title">Welcome back</Modal.Title>
+      </Modal.Header>
+      <ModalBody>
+            <p className="text-muted mb-4">Sign in to continue to your account.</p>
+            <Form onSubmit={handleOnSubmit}>
+              <Form.Group className="mb-3" controlId="sign-in-email">
                   <Form.Label>Email</Form.Label>
                   <Form.Control
                     type="email"
@@ -72,9 +66,9 @@ function Login() {
                     onChange={handleOnChange}
                   />
                 </Form.Group>
-                <Form.Group className="mb-3">
+                <Form.Group className="mb-3" controlId="sign-in-password">
                   <Form.Label>Password</Form.Label>
-                  <div className='d-flex gap-2'>
+                  <div className="password-field">
                   <Form.Control
                     type={showPassword ? "text" : "password"}
                     placeholder="Enter your password"
@@ -82,7 +76,7 @@ function Login() {
                     name="password"
                     onChange={handleOnChange}
                   />
-                  <div style={{position:'absolute', right:'30px',  }} onClick={() => setShowPassword((prev) => !prev)} >
+                  <button type="button" className="password-toggle" aria-label={showPassword ? "Hide password" : "Show password"} onClick={() => setShowPassword((prev) => !prev)}>
                   {
                     !showPassword ? (
                       <AiOutlineEyeInvisible fontSize={24} fill="#AFB2BF" />
@@ -91,7 +85,7 @@ function Login() {
                         <AiOutlineEye fontSize={24} fill="#AFB2BF" />
                       )
                   }
-                  </div>
+                  </button>
                   </div>
                 </Form.Group>
                 <Form.Group className="mb-3">
@@ -102,7 +96,7 @@ function Login() {
                     onChange={() => setRememberMe(!rememberMe)}
                   />
                 </Form.Group>
-                <Button type="submit" variant="primary" block>
+                <Button type="submit" variant="primary" className="w-100">
                   Sign In
                 </Button>
               </Form>
@@ -112,10 +106,10 @@ function Login() {
                   {/* <Link to={<Signup/>}>
                   SignUp
                   </Link> */}
-                  <a href="#">Signup</a>
+                  <button type="button" className="btn btn-link p-0 align-baseline" onClick={onSwitchToSignup}>Sign up</button>
                 </p>
                 <p className="text-muted">
-                  Forgot your password? <a href="#">Reset password</a>
+                  Forgot your password? <button type="button" className="btn btn-link p-0 align-baseline">Reset password</button>
                 </p>
                 <div className="social-media">
                   <Button variant="outline-primary" className="me-2">
@@ -132,12 +126,9 @@ function Login() {
                   </Button>
                 </div>
               </div>
-            </ModalBody>
-          </Col>
-        </Row>
-
+        </ModalBody>
       </Modal>
-    </Container>
+      </>
   );
 }
 

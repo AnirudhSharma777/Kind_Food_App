@@ -8,7 +8,7 @@
     height: 100%;
     -webkit-transition: all .4s .2s ease-in-out;
     transition: all .4s .2s ease-in-out;
-    background-color: #fff;
+    background-color: rgba(247, 248, 246, 0.96);
     opacity: 0;
     visibility: hidden;
     z-index: 9999;
@@ -37,7 +37,7 @@
     font-family: 'Inter', sans-serif;
     font-size: 1rem;
     font-weight: normal;
-    color: #737491;
+    color: #6b756f;
   }
   .page-spinner {
     display: inline-block;
@@ -45,7 +45,7 @@
     height: 2.75rem;
     margin-bottom: .75rem;
     vertical-align: text-bottom;
-    border: .15em solid #766df4;
+    border: .15em solid #287a54;
     border-right-color: transparent;
     border-radius: 50%;
     -webkit-animation: spinner .75s linear infinite;

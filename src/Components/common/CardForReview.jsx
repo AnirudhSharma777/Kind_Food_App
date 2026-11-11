@@ -7,21 +7,22 @@ const CardForReview = (props) => {
     return (
         <div>
             <Container>
-                <Card style={{height: '18rem' }} className='shadow border mt-5 mb-5'>
+                <Card className='review-card border'>
                     <Card.Header className="d-flex justify-content-between align-items-center bg-white no-border">
                         <div className="d-flex align-items-center">
                             <Image
                                 src={props.item.image}
                                 roundedCircle
-                                style={{ width: '50px', height: '50px', marginRight: '10px' }}
+                                alt=""
+                                style={{ width: '50px', height: '50px', marginRight: '10px', objectFit: 'cover' }}
                             />
                             <div>
                                 <Card.Title className="mb-0">{props.item.customer}</Card.Title>
-                                <Card.Subtitle className="text-muted">{props.item.date}</Card.Subtitle>
+                                    {props.item.date && <Card.Subtitle className="text-muted">{props.item.date}</Card.Subtitle>}
                             </div>
                         </div>
                         <div>
-                            {props.item.rating}
+                            <span className='review-stars' aria-label={`${props.item.rating} stars`}>{props.item.rating}</span>
                         </div>
                     </Card.Header>
                     <Card.Body>

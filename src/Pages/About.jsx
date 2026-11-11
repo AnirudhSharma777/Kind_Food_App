@@ -1,26 +1,29 @@
 import React from 'react'
-import { Container, Row } from 'react-bootstrap';
 import Rider from '../Components/About/Rider';
 import AnimationRider from '../Components/About/AnimationRider';
 import Status from '../Components/About/Status';
 import Intro from "../Components/About/Intro"
 import ReviewCard from '../Components/common/ReviewCard';
 import TeamCard from '../Components/About/TeamCard';
+import AboutCta from '../Components/About/AboutCta';
 
 const About = () => {
   return (
-    <div className=''>
-      <Container fluid className='w-100'>
-        <Row>
-          <Rider />
-        </Row>
-        <Status />
-        <Intro/>
-        <TeamCard/>
+    <main className='about-page'>
+      <Rider />
+      <Status />
+      <Intro />
+      <TeamCard />
+      <section className='customer-stories'>
+        <div className='text-center'>
+          <span className='eyebrow'>Kind words from our table</span>
+          <h2 className='section-heading'>Meals worth talking about</h2>
+        </div>
         <ReviewCard />
-        <AnimationRider />
-      </Container>
-    </div>
+      </section>
+      <AnimationRider />
+      <AboutCta />
+    </main>
   )
 }
 
