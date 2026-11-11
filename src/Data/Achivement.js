@@ -1,22 +1,22 @@
 export const achivements = [
     {
         id:1,
-        name: 'Years Of Happiness',
-        value:'15'
+        name: 'Fresh ingredients',
+        value:'01'
     },
     {
         id:2,
-        name: 'Employees Worldwide',
-        value:'2k+'
+        name: 'Thoughtful preparation',
+        value:'02'
     },
     {
         id:3,
-        value: '99%',
-        name:'Positive Feedback'
+        value: '03',
+        name:'Friendly delivery'
     },
     {
         id:4,
-        name: 'Successfully Completed Projects',
-        value:'100+'
+        name: 'Made for sharing',
+        value:'04'
     }
 ]

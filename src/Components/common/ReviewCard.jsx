@@ -14,7 +14,7 @@ import { Pagination } from 'swiper/modules';
 
 const ReviewCard = () => {
     return (
-        <div>
+        <section className='review-section'>
             <Container>
 
                 <Swiper
@@ -24,13 +24,13 @@ const ReviewCard = () => {
                         clickable: true,
                     }}
                     modules={[Pagination]}
-                    className="mySwiper"
+                    className="review-slider"
                 >
                     {
                         ReviewCartData.map((item) => {
                             // console.log(item);
                             return (
-                                <SwiperSlide key={item.id} slidesPerView={1}>
+                                <SwiperSlide key={item.id}>
                                     <CardForReview item={item} />
                                 </SwiperSlide>
                             )
@@ -38,7 +38,7 @@ const ReviewCard = () => {
                     }
                 </Swiper>
             </Container>
-        </div>
+        </section>
     )
 }
 
