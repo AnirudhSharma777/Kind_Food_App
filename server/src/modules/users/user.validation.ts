@@ -1,15 +1,35 @@
 import { UserStatus } from "@prisma/client";
-import type { CreateUserBody, UpdateUserBody, UserListQuery } from "./user.types";
+import type { RegisterUserBody, UpdateUserBody, UserListQuery } from "./user.types";
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+// Activation tokens are 32 random bytes encoded as base64url (43 chars).
+const activationTokenPattern = /^[A-Za-z0-9_-]{43}$/;
 const statuses = new Set<string>(Object.values(UserStatus));
 
-export class RequestValidationError extends Error {
-  constructor(message: string) {
+export class HttpError extends Error {
+  constructor(
+    readonly statusCode: number,
+    message: string,
+  ) {
     super(message);
+    this.name = "HttpError";
+  }
+}
+
+export class RequestValidationError extends HttpError {
+  constructor(message: string) {
+    super(400, message);
     this.name = "RequestValidationError";
   }
+}
+
+function parseEmail(value: unknown): string {
+  if (typeof value !== "string" || !emailPattern.test(value.trim()) || value.length > 320) {
+    throw new RequestValidationError("email must be a valid email address of at most 320 characters");
+  }
+
+  return value.trim().toLowerCase();
 }
 
 function asObject(value: unknown): Record<string, unknown> {
@@ -60,28 +80,42 @@ export function parseUserId(value: string): string {
   return value;
 }
 
-export function parseCreateUserBody(input: unknown): CreateUserBody {
+export function parseRegisterUserBody(input: unknown): RegisterUserBody {
   const body = asObject(input);
-  const allowedFields = ["email", "phone", "firstName", "lastName", "status"];
+  const allowedFields = ["email", "password", "phone", "firstName", "lastName"];
   const unknownFields = Object.keys(body).filter((field) => !allowedFields.includes(field));
 
   if (unknownFields.length > 0) {
     throw new RequestValidationError(`Unsupported fields: ${unknownFields.join(", ")}`);
   }
 
-  const email = body.email;
+  const password = body.password;
 
-  if (typeof email !== "string" || !emailPattern.test(email.trim()) || email.length > 320) {
-    throw new RequestValidationError("email must be a valid email address of at most 320 characters");
+  // bcrypt silently ignores everything past 72 *bytes*, so measure bytes, not characters.
+  if (typeof password !== "string" || password.length < 8 || Buffer.byteLength(password, "utf8") > 72) {
+    throw new RequestValidationError("password must be at least 8 characters and at most 72 bytes");
   }
 
   return {
-    email: email.trim().toLowerCase(),
+    email: parseEmail(body.email),
+    password,
     phone: optionalString(body, "phone", 30),
     firstName: optionalString(body, "firstName", 100),
     lastName: optionalString(body, "lastName", 100),
-    status: optionalStatus(body),
   };
+}
+
+export function parseActivationToken(value: unknown): string {
+  if (typeof value !== "string" || !activationTokenPattern.test(value)) {
+    throw new RequestValidationError("Activation link is invalid or has expired");
+  }
+
+  return value;
+}
+
+export function parseResendActivationBody(input: unknown): string {
+  const body = asObject(input);
+  return parseEmail(body.email);
 }
 
 export function parseUpdateUserBody(input: unknown): UpdateUserBody {
@@ -105,11 +139,7 @@ export function parseUpdateUserBody(input: unknown): UpdateUserBody {
   };
 
   if (body.email !== undefined) {
-    if (typeof body.email !== "string" || !emailPattern.test(body.email.trim()) || body.email.length > 320) {
-      throw new RequestValidationError("email must be a valid email address of at most 320 characters");
-    }
-
-    result.email = body.email.trim().toLowerCase();
+    result.email = parseEmail(body.email);
   }
 
   return Object.fromEntries(Object.entries(result).filter(([, value]) => value !== undefined)) as UpdateUserBody;

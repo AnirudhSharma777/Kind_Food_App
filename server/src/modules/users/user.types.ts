@@ -1,16 +1,18 @@
-import type { Prisma , UserStatus} from "@prisma/client";
+import type { Prisma, UserStatus } from "@prisma/client";
 
-// export type UserStatus = NonNullable<Prisma.UserGetPayload<{}>["status"]>;
-
-export type CreateUserBody = {
+// Body accepted by POST /users/register. Status is intentionally not accepted:
+// every self-registered account starts as PENDING until its email is verified.
+export type RegisterUserBody = {
   email: string;
+  password: string;
   phone?: string;
   firstName?: string;
   lastName?: string;
-  status?: UserStatus;
 };
 
-export type UpdateUserBody = Partial<CreateUserBody>;
+export type UpdateUserBody = Partial<Omit<RegisterUserBody, "password">> & {
+  status?: UserStatus;
+};
 
 export type UserListQuery = {
   page: number;
@@ -26,10 +28,9 @@ export const publicUserSelect = {
   firstName: true,
   lastName: true,
   status: true,
+  activatedAt: true,
   createdAt: true,
   updatedAt: true,
 } satisfies Prisma.UserSelect;
 
 export type PublicUser = Prisma.UserGetPayload<{ select: typeof publicUserSelect }>;
-
-
