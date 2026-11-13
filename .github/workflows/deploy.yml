@@ -6,17 +6,43 @@
 #   vars:    SSH_HOST, SSH_USER, SSH_PORT (optional), DEPLOY_PATH (optional), PUBLIC_URL
 #   secrets: SSH_PRIVATE_KEY, SSH_KNOWN_HOSTS, APP_ENV_FILE
 # Repository level:
-#   vars:    DOCKERHUB_USERNAME, DOCKERHUB_IMAGE
-#   secrets: DOCKERHUB_TOKEN (read/write, CI push), DOCKERHUB_PULL_TOKEN (read-only, servers)
+#   vars:    DOCKERHUB_IMAGE
+#   secrets: DOCKER_USERNAME, DOCKER_PASSWORD (Docker Hub access token)
+
+# Reusable deployment workflow.
+# Called by ci-cd.yml and rollback.yml.
+#
+# GitHub Environment variables (development / uat / production):
+#   SSH_HOST
+#   SSH_USER
+#   SSH_PORT (optional, defaults to 22)
+#   DEPLOY_PATH (optional, defaults to /opt/kindfood)
+#   PUBLIC_URL
+#
+# GitHub Environment secrets:
+#   SSH_PRIVATE_KEY
+#   SSH_KNOWN_HOSTS
+#   APP_ENV_FILE
+#
+# Repository variables:
+#   DOCKERHUB_IMAGE
+#
+# Repository secrets:
+#   DOCKER_USERNAME
+#   DOCKER_PASSWORD (Docker Hub access token)
+
 name: Deploy
 
 on:
   workflow_call:
     inputs:
       environment:
+        description: Target deployment environment
         type: string
         required: true
+
       image_tag:
+        description: Exact Docker image tag to deploy
         type: string
         required: true
 
@@ -27,25 +53,85 @@ jobs:
   deploy:
     name: Deploy ${{ inputs.image_tag }} to ${{ inputs.environment }}
     runs-on: ubuntu-latest
+
     environment:
       name: ${{ inputs.environment }}
       url: ${{ vars.PUBLIC_URL }}
-    # Never run two deploys to the same environment at once.
+
     concurrency:
       group: deploy-${{ inputs.environment }}
       cancel-in-progress: false
+
     env:
       IMAGE_TAG: ${{ inputs.image_tag }}
       DEPLOY_PATH: ${{ vars.DEPLOY_PATH || '/opt/kindfood' }}
       PUBLIC_URL: ${{ vars.PUBLIC_URL }}
+      DOCKERHUB_IMAGE: ${{ vars.DOCKERHUB_IMAGE }}
+
     steps:
-      - name: Validate inputs
+      # -----------------------------------------------
+      # 1. Validate deployment configuration
+      # -----------------------------------------------
+      - name: Validate deployment configuration
+        env:
+          SSH_HOST: ${{ vars.SSH_HOST }}
+          SSH_USER: ${{ vars.SSH_USER }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
+          APP_ENV_FILE: ${{ secrets.APP_ENV_FILE }}
         run: |
-          [[ "$IMAGE_TAG" =~ ^[A-Za-z0-9._-]{1,128}$ ]] || { echo "Invalid image tag: $IMAGE_TAG"; exit 1; }
-          [[ "$DEPLOY_PATH" =~ ^/[A-Za-z0-9._/-]+$ ]] || { echo "Invalid DEPLOY_PATH"; exit 1; }
+          set -euo pipefail
 
-      - uses: actions/checkout@v5
+          [[ "$IMAGE_TAG" =~ ^[A-Za-z0-9._-]{1,128}$ ]] || {
+            echo "::error::Invalid Docker image tag"
+            exit 1
+          }
 
+          [[ "$DEPLOY_PATH" =~ ^/[A-Za-z0-9._/-]+$ ]] || {
+            echo "::error::Invalid DEPLOY_PATH"
+            exit 1
+          }
+
+          [[ -n "$DOCKERHUB_IMAGE" ]] || {
+            echo "::error::DOCKERHUB_IMAGE is missing"
+            exit 1
+          }
+
+          [[ -n "$SSH_HOST" ]] || {
+            echo "::error::SSH_HOST is missing"
+            exit 1
+          }
+
+          [[ -n "$SSH_USER" ]] || {
+            echo "::error::SSH_USER is missing"
+            exit 1
+          }
+
+          [[ -n "$SSH_PRIVATE_KEY" ]] || {
+            echo "::error::SSH_PRIVATE_KEY is missing"
+            exit 1
+          }
+
+          [[ -n "$SSH_KNOWN_HOSTS" ]] || {
+            echo "::error::SSH_KNOWN_HOSTS is missing"
+            exit 1
+          }
+
+          [[ -n "$APP_ENV_FILE" ]] || {
+            echo "::error::APP_ENV_FILE is missing"
+            exit 1
+          }
+
+          echo "Deployment configuration validated."
+          echo "Environment: ${{ inputs.environment }}"
+          echo "Image: $DOCKERHUB_IMAGE:$IMAGE_TAG"
+
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      # -----------------------------------------------
+      # 2. Configure SSH
+      # -----------------------------------------------
       - name: Configure SSH
         env:
           SSH_HOST: ${{ vars.SSH_HOST }}
@@ -54,10 +140,15 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
         run: |
+          set -euo pipefail
+
           install -m 700 -d ~/.ssh
+
           printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_deploy
           printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+
           chmod 600 ~/.ssh/id_deploy ~/.ssh/known_hosts
+
           cat > ~/.ssh/config <<EOF
           Host target
             HostName $SSH_HOST
@@ -69,33 +160,90 @@ jobs:
             BatchMode yes
           EOF
 
-      - name: Upload compose file, deploy script and environment config
+          chmod 600 ~/.ssh/config
+
+          ssh target "echo SSH connection successful"
+
+      # -----------------------------------------------
+      # 3. Upload deployment files and environment config
+      # -----------------------------------------------
+      - name: Upload deployment files
         env:
           APP_ENV_FILE: ${{ secrets.APP_ENV_FILE }}
-          DOCKERHUB_IMAGE: ${{ vars.DOCKERHUB_IMAGE }}
         run: |
+          set -euo pipefail
+
           umask 077
-          { printf '%s\n' "$APP_ENV_FILE"; echo "DOCKERHUB_IMAGE=$DOCKERHUB_IMAGE"; } > env.upload
+
+          {
+            printf '%s\n' "$APP_ENV_FILE"
+            printf 'DOCKERHUB_IMAGE=%s\n' "$DOCKERHUB_IMAGE"
+          } > env.upload
+
           ssh target "mkdir -p '$DEPLOY_PATH'"
+
           scp docker-compose.yml deploy/deploy.sh target:"$DEPLOY_PATH/"
+
           scp env.upload target:"$DEPLOY_PATH/.env"
-          ssh target "chmod 600 '$DEPLOY_PATH/.env' && chmod 700 '$DEPLOY_PATH/deploy.sh'"
+
+          ssh target "
+            chmod 600 '$DEPLOY_PATH/.env' &&
+            chmod 700 '$DEPLOY_PATH/deploy.sh'
+          "
+
           rm -f env.upload
 
-      - name: Log the server in to Docker Hub
+      # -----------------------------------------------
+      # 4. Docker Hub login on deployment server
+      # -----------------------------------------------
+      - name: Login server to Docker Hub
         env:
-          DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
-          DOCKERHUB_PULL_TOKEN: ${{ secrets.DOCKERHUB_PULL_TOKEN }}
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKERHUB_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: |
-          if [ -z "$DOCKERHUB_PULL_TOKEN" ]; then echo "No pull token set (public repo?) - skipping"; exit 0; fi
-          printf '%s' "$DOCKERHUB_PULL_TOKEN" | ssh target "docker login -u '$DOCKERHUB_USERNAME' --password-stdin"
+          set -euo pipefail
 
-      - name: Deploy (migrate, health-gated start, auto-rollback on failure)
-        run: ssh target "'$DEPLOY_PATH/deploy.sh' '$IMAGE_TAG'"
+          if [ -z "$DOCKER_PASSWORD" ]; then
+            echo "No pull token configured."
+            echo "Skipping login (works for public images)."
+            exit 0
+          fi
 
-      - name: Smoke test through the public URL
+          if [ -z "$DOCKER_USERNAME" ]; then
+            echo "::error::DOCKER_USERNAME is missing"
+            exit 1
+          fi
+
+          printf '%s' "$DOCKER_PASSWORD" |
+            ssh target "docker login -u '$DOCKER_USERNAME' --password-stdin"
+
+      # -----------------------------------------------
+      # 5. Deploy exact image tag
+      # -----------------------------------------------
+      - name: Deploy application
+        run: |
+          set -euo pipefail
+
+          echo "Deploying $DOCKERHUB_IMAGE:$IMAGE_TAG"
+
+          ssh target "'$DEPLOY_PATH/deploy.sh' '$IMAGE_TAG'"
+
+      # -----------------------------------------------
+      # 6. Public health check
+      # -----------------------------------------------
+      - name: Smoke test
         if: env.PUBLIC_URL != ''
         run: |
-          curl --fail --silent --show-error --max-time 10 \
-               --retry 10 --retry-delay 6 --retry-all-errors \
-               "$PUBLIC_URL/api/v1/health"
+          set -euo pipefail
+
+          curl \
+            --fail \
+            --silent \
+            --show-error \
+            --max-time 10 \
+            --retry 10 \
+            --retry-delay 6 \
+            --retry-all-errors \
+            "$PUBLIC_URL/api/v1/health"
+
+          echo "Deployment health check successful."

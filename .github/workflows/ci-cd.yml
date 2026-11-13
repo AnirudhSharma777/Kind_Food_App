@@ -3,24 +3,44 @@
 #   push to develop        -> test -> build & push sha-<commit>   (Development deploy disabled)
 #   push to uat            -> test -> build & push sha-<commit> -> deploy UAT
 #   push to main           -> test -> build & push sha-<commit> -> deploy Production
+
 name: CI/CD
 
 on:
   push:
-    branches: [develop, uat, main]
+    branches:
+      - develop
+      - uat
+      - main
+
   pull_request:
-    branches: [develop, uat, main]
+    branches:
+      - develop
+      - uat
+      - main
 
 permissions:
   contents: read
 
+concurrency:
+  group: ci-cd-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 env:
+  # PR builds do not push, so they can use a local image name when the
+  # Docker Hub repository variable is not configured yet. Pushes are checked
+  # below and must provide the real Docker Hub image name.
   IMAGE: ${{ vars.DOCKERHUB_IMAGE || 'local/kind-food-app' }}
 
 jobs:
+
+  # -----------------------------------------------
+  # 1. TEST AND VALIDATE
+  # -----------------------------------------------
   test:
-    name: Test & validate
+    name: Test and Validate
     runs-on: ubuntu-latest
+
     services:
       postgres:
         image: postgres:16
@@ -28,16 +48,23 @@ jobs:
           POSTGRES_USER: ci
           POSTGRES_PASSWORD: ci
           POSTGRES_DB: ci
-        ports: ["5432:5432"]
+        ports:
+          - 5432:5432
         options: >-
           --health-cmd "pg_isready -U ci"
-          --health-interval 5s --health-timeout 5s --health-retries 10
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
     env:
       DATABASE_URL: postgresql://ci:ci@localhost:5432/ci?schema=public
-    steps:
-      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v5
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
         with:
           node-version-file: .nvmrc
           cache: npm
@@ -45,98 +72,165 @@ jobs:
             package-lock.json
             server/package-lock.json
 
-      - name: Frontend - install
+      # Frontend
+      - name: Install frontend dependencies
         run: npm ci
 
-      - name: Frontend - unit tests
+      - name: Run frontend tests
         run: npx react-scripts test --watchAll=false --passWithNoTests
 
-      - name: Backend - install
+      # Backend
+      - name: Install backend dependencies
         working-directory: server
         run: npm ci
 
-      - name: Backend - generate Prisma client and validate schema
+      - name: Generate Prisma client
         working-directory: server
-        run: npx prisma generate && npx prisma validate
+        run: npx prisma generate
 
-      - name: Backend - typecheck and tests
+      - name: Validate Prisma schema
         working-directory: server
-        run: npm test
+        run: npx prisma validate
 
-      - name: Backend - migrations apply cleanly to an empty database
+      - name: Apply database migrations
         working-directory: server
         run: npx prisma migrate deploy
 
+      - name: Run backend tests
+        working-directory: server
+        run: npm test
+
+
+  # -----------------------------------------------
+  # 2. BUILD AND PUSH DOCKER IMAGE
+  # -----------------------------------------------
   build:
-    name: Build & push image
+    name: Build and Push Docker Image
     needs: test
     runs-on: ubuntu-latest
+
     outputs:
       image_tag: ${{ steps.tag.outputs.image_tag }}
+
     steps:
-      - uses: actions/checkout@v5
+      - name: Checkout code
+        uses: actions/checkout@v5
 
-      - id: tag
-        run: echo "image_tag=sha-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+      # Validate Docker Hub image configuration
+      - name: Validate Docker image configuration
+        env:
+          DOCKER_IMAGE: ${{ env.IMAGE }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          set -euo pipefail
 
-      # Emulation so the runner (x86) can also build the ARM image for OCI Ampere A1.
-      - uses: docker/setup-qemu-action@v3
+          if [ "$EVENT_NAME" = "push" ] && [ "$DOCKER_IMAGE" = "local/kind-food-app" ]; then
+            echo "::error::DOCKERHUB_IMAGE is required for push runs."
+            exit 1
+          fi
+
+          echo "Docker image: $DOCKER_IMAGE"
+
+      # Generate a valid tag for both push and PR events
+      - name: Generate unique image tag
+        id: tag
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_REF: ${{ github.base_ref }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            BRANCH="$BASE_REF"
+          else
+            BRANCH="$REF_NAME"
+          fi
+
+          # Docker tags may not contain slashes or other ref-name characters.
+          BRANCH="$(printf '%s' "$BRANCH" | tr '[:upper:]' '[:lower:]' | sed 's#[^a-z0-9_.-]#-#g; s#^-*##; s#-*$##')"
+          BRANCH="${BRANCH:-branch}"
+          BRANCH="${BRANCH:0:110}"
+
+          echo "image_tag=${BRANCH}-sha-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+          echo "branch_tag=${BRANCH}" >> "$GITHUB_OUTPUT"
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
         with:
           platforms: arm64
 
-      - uses: docker/setup-buildx-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      - name: Log in to Docker Hub
+      # Login only for actual branch pushes, never for PRs
+      - name: Login to Docker Hub
         if: github.event_name == 'push'
         uses: docker/login-action@v3
         with:
-          username: ${{ vars.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # Built ONCE per commit. Every environment deploys this exact image by its
-      # immutable sha tag; the branch tag (develop/uat/main) is just a convenience pointer.
-      # Multi-arch: OCI Ampere A1 (arm64) and AMD/Intel shapes (amd64) both pull the same tag.
-      - uses: docker/build-push-action@v6
+      # Build for PRs; build and push for branch pushes
+      - name: Build Docker image
+        uses: docker/build-push-action@v6
         with:
           context: .
           platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name == 'push' }}
-          build-args: GIT_SHA=${{ github.sha }}
+          build-args: |
+            GIT_SHA=${{ github.sha }}
           tags: |
             ${{ env.IMAGE }}:${{ steps.tag.outputs.image_tag }}
-            ${{ env.IMAGE }}:${{ github.event_name == 'pull_request' && github.base_ref || github.ref_name }}
+            ${{ env.IMAGE }}:${{ steps.tag.outputs.branch_tag }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  # deploy-development:
-  #   name: Development
-  #   needs: build
-  #   if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
-  #   uses: ./.github/workflows/deploy.yml
-  #   with:
-  #     environment: development
-  #     image_tag: ${{ needs.build.outputs.image_tag }}
-  #   secrets: inherit
 
-  # Push to the uat branch only.
+  # -----------------------------------------------
+  # 3. DEPLOY DEVELOPMENT
+  # -----------------------------------------------
+  deploy-development:
+    name: Deploy Development
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+
+    uses: ./.github/workflows/deploy.yml
+
+    with:
+      environment: development
+      image_tag: ${{ needs.build.outputs.image_tag }}
+
+    secrets: inherit
+
+
+  # -----------------------------------------------
+  # 4. DEPLOY UAT
+  # -----------------------------------------------
   deploy-uat:
-    name: UAT
+    name: Deploy UAT
     needs: build
     if: github.event_name == 'push' && github.ref == 'refs/heads/uat'
+
     uses: ./.github/workflows/deploy.yml
+
     with:
       environment: uat
       image_tag: ${{ needs.build.outputs.image_tag }}
+
     secrets: inherit
 
-  # Push to the main branch only. If the "production" GitHub Environment has
-  # required reviewers, this job also waits for their approval.
+
+  # -----------------------------------------------
+  # 5. DEPLOY PRODUCTION
+  # -----------------------------------------------
   deploy-production:
-    name: Production
+    name: Deploy Production
     needs: build
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
     uses: ./.github/workflows/deploy.yml
+
     with:
       environment: production
       image_tag: ${{ needs.build.outputs.image_tag }}
+
     secrets: inherit
