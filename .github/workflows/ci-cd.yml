@@ -7,13 +7,19 @@
 name: CI/CD
 
 on:
+  # Run whenever code reaches these branches
   push:
     branches:
       - develop
       - uat
       - main
 
+  # Run validation when PRs are created or updated
   pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
     branches:
       - develop
       - uat
