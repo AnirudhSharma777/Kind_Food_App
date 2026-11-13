@@ -6,9 +6,10 @@ arm64 and amd64, pushed to Docker Hub, and deployed by Docker Compose to an
 `postgres:16` and `redis:7-alpine` containers with named volumes.
 
 ```
- push develop ──► Test ─► Build sha-abc1234 ─► Docker Hub ─► Development VM
- push main ─────► Test ─► Build sha-def5678 ─► Docker Hub ─► UAT VM ─► [approval] ─► Production VM
-                                                              (same sha-def5678 image)
+ push develop ──► Test ─► Build sha-abc1234 ─► Docker Hub   (Development deploy disabled)
+ push uat ─────► Test ─► Build sha-bcd2345 ─► Docker Hub ─► UAT VM
+ push main ─────► Test ─► Build sha-def5678 ─► Docker Hub ─► [approval, if set] ─► Production VM
+ A deploy runs only if Test and Build of that same push succeeded.
  Each VM:  Caddy (HTTPS) ─► app:5000 ─► postgres (volume pgdata) + redis (volume redisdata)
 ```
 
@@ -131,7 +132,7 @@ volumes stay separate.
 
 ## 4. GitHub configuration (once)
 
-1. Create the `develop` branch. Protect `develop` and `main`: require a PR and the
+1. Create the `develop` and `uat` branches. Protect `develop`, `uat` and `main`: require a PR and the
    **Test & validate** check.
 2. **Settings → Secrets and variables → Actions** (repository level):
    - Variables: `DOCKERHUB_USERNAME`, `DOCKERHUB_IMAGE` (e.g. `myuser/kind-food-app`)
@@ -140,7 +141,7 @@ volumes stay separate.
 
    | | development | uat | production |
    |---|---|---|---|
-   | Deployment branches | `develop` | `main` | `main` |
+   | Deployment branches | `develop` | `uat` | `main` |
    | Required reviewers | – | – | **yes** (enable "prevent self-review") |
    | Var `SSH_HOST`, `SSH_USER` (`deploy`) | dev VM | uat VM | prod VM |
    | Var `DEPLOY_PATH` (optional) | `/opt/kindfood-dev` | `/opt/kindfood-uat` | `/opt/kindfood` |
@@ -159,10 +160,9 @@ volumes stay separate.
 
 1. Feature branch → PR to `develop` → CI tests + test image build.
 2. Merge → image `sha-xxxxxxx` pushed → **Development** deployed automatically.
-3. PR `develop` → `main` → merge → new image → **UAT** deployed automatically.
-4. QA tests UAT. When signed off, a reviewer approves the waiting **Production** job
-   of that same run. Production then receives the exact image that was tested.
-   (If newer commits reached UAT meanwhile, approve the run whose sha QA tested.)
+3. PR `develop` → `uat` → merge → test + build → **UAT** deployed automatically.
+4. After QA signs off, PR `uat` → `main` → merge → test + build → **Production**
+   deployed (after reviewer approval, if the environment requires it).
 
 ## 6. Rollback
 

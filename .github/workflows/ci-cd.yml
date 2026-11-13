@@ -1,15 +1,15 @@
-# Pipeline
-#   PR to develop/main  -> test + build image (not pushed)
-#   push to develop     -> test -> build & push sha-<commit> -> deploy Development
-#   push to main        -> test -> build & push sha-<commit> -> deploy UAT
-#                          -> (manual approval) -> deploy the SAME image to Production
+# Pipeline (a deploy runs only if test AND build of that same push succeeded)
+#   PR to develop/uat/main -> test + build image (not pushed)
+#   push to develop        -> test -> build & push sha-<commit>   (Development deploy disabled)
+#   push to uat            -> test -> build & push sha-<commit> -> deploy UAT
+#   push to main           -> test -> build & push sha-<commit> -> deploy Production
 name: CI/CD
 
 on:
   push:
-    branches: [develop, main]
+    branches: [develop, uat, main]
   pull_request:
-    branches: [develop, main]
+    branches: [develop, uat, main]
 
 permissions:
   contents: read
@@ -94,7 +94,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       # Built ONCE per commit. Every environment deploys this exact image by its
-      # immutable sha tag; the branch tag (develop/main) is just a convenience pointer.
+      # immutable sha tag; the branch tag (develop/uat/main) is just a convenience pointer.
       # Multi-arch: OCI Ampere A1 (arm64) and AMD/Intel shapes (amd64) both pull the same tag.
       - uses: docker/build-push-action@v6
         with:
@@ -104,35 +104,36 @@ jobs:
           build-args: GIT_SHA=${{ github.sha }}
           tags: |
             ${{ env.IMAGE }}:${{ steps.tag.outputs.image_tag }}
-            ${{ env.IMAGE }}:${{ github.ref_name == 'main' && 'main' || 'develop' }}
+            ${{ env.IMAGE }}:${{ github.event_name == 'pull_request' && github.base_ref || github.ref_name }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  deploy-development:
-    name: Development
-    needs: build
-    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
-    uses: ./.github/workflows/deploy.yml
-    with:
-      environment: development
-      image_tag: ${{ needs.build.outputs.image_tag }}
-    secrets: inherit
+  # deploy-development:
+  #   name: Development
+  #   needs: build
+  #   if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+  #   uses: ./.github/workflows/deploy.yml
+  #   with:
+  #     environment: development
+  #     image_tag: ${{ needs.build.outputs.image_tag }}
+  #   secrets: inherit
 
+  # Push to the uat branch only.
   deploy-uat:
     name: UAT
     needs: build
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/uat'
     uses: ./.github/workflows/deploy.yml
     with:
       environment: uat
       image_tag: ${{ needs.build.outputs.image_tag }}
     secrets: inherit
 
-  # Waits for a required reviewer on the "production" GitHub Environment.
-  # Approve only after UAT sign-off of this same sha tag.
+  # Push to the main branch only. If the "production" GitHub Environment has
+  # required reviewers, this job also waits for their approval.
   deploy-production:
     name: Production
-    needs: [build, deploy-uat]
+    needs: build
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     uses: ./.github/workflows/deploy.yml
     with:
