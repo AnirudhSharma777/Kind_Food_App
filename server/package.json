@@ -1,29 +1,45 @@
 {
-  "name": "server",
+  "name": "king-food-app-server",
   "version": "1.0.0",
-  "main": "index.js",
+  "private": true,
+  "description": "KingFoodApp modular monolith backend",
+  "main": "dist/server.js",
   "engines": {
-    "node": "26.x"
+    "node": ">=20.0.0"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js",
-    "dev": "nodemon index.js"
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx watch src/server.ts",
+    "debug": "node --inspect=9229 --import tsx src/server.ts",
+    "start": "node dist/server.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "prisma:generate": "prisma generate",
+    "prisma:validate": "prisma validate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:deploy": "prisma migrate deploy",
+    "prisma:seed": "tsx prisma/seed.ts",
+    "db:setup": "npm run prisma:generate && npm run prisma:migrate && npm run prisma:seed",
+    "test": "npm run typecheck"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
   "dependencies": {
-    "bcrypt": "^5.1.1",
-    "bcryptjs": "^2.4.3",
-    "cookie-parser": "^1.4.6",
+    "@prisma/client": "^6.19.0",
+    "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "express": "^4.19.2",
-    "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.4.4",
-    "nodemon": "^3.1.4",
-    "otp-generator": "^4.0.1"
+    "dotenv": "^16.4.7",
+    "express": "^5.1.0",
+    "nodemailer": "^10.5.0",
+    "prisma": "^6.19.3"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.3",
+    "@types/node": "^22.15.0",
+    "@types/nodemailer": "^8.0.2",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
   }
 }

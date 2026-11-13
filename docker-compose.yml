@@ -1,0 +1,110 @@
+# Same file for Development, UAT and Production.
+# Everything that differs per environment comes from the .env file next to it
+# (see deploy/.env.example). The project name includes APP_ENV, so containers,
+# networks and volumes of different environments never collide, even on one host.
+name: kindfood-${APP_ENV:?Set APP_ENV in .env}
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+
+x-database-url: &database-url "postgresql://${POSTGRES_USER:?}:${POSTGRES_PASSWORD:?}@postgres:5432/${POSTGRES_DB:?}?schema=public"
+
+services:
+  app:
+    image: ${DOCKERHUB_IMAGE:?}:${IMAGE_TAG:?Set IMAGE_TAG (CI does this on deploy)}
+    restart: unless-stopped
+    init: true
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      APP_ENV: ${APP_ENV}
+      NODE_ENV: production
+      PORT: "5000"
+      DATABASE_URL: *database-url
+      REDIS_URL: "redis://:${REDIS_PASSWORD:?}@redis:6379/0"
+      CORS_ORIGIN: ${PUBLIC_URL:?}
+      API_BASE_URL: ${PUBLIC_URL:?}
+      ACTIVATION_TOKEN_TTL_MINUTES: ${ACTIVATION_TOKEN_TTL_MINUTES:-1440}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_SECURE: ${SMTP_SECURE:-false}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      MAIL_FROM: ${MAIL_FROM:-Kind Food <no-reply@kindfood.local>}
+    # Bound to localhost by default: a reverse proxy on the host (Caddy/Nginx)
+    # terminates HTTPS and forwards to this port.
+    ports:
+      - "${APP_BIND:-127.0.0.1}:${APP_PORT:-5000}:5000"
+    # Health check is defined in the Dockerfile (GET /api/v1/health, which also pings Postgres).
+    logging: *logging
+    networks: [backend]
+
+  # One-shot job, same image as the app: applies pending Prisma migrations.
+  # Not started by `up`; deploy.sh runs it explicitly with `docker compose run --rm migrate`.
+  migrate:
+    image: ${DOCKERHUB_IMAGE:?}:${IMAGE_TAG:?}
+    profiles: ["tools"]
+    command: ["./node_modules/.bin/prisma", "migrate", "deploy"]
+    environment:
+      DATABASE_URL: *database-url
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      disable: true
+    logging: *logging
+    networks: [backend]
+
+  postgres:
+    # Pin the major version. Upgrading a major version needs a dump/restore.
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      # Only applied when the volume is EMPTY (first start). Changing them later
+      # does not change the existing database's password; see deploy/README.md.
+      POSTGRES_USER: ${POSTGRES_USER:?}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?}
+      POSTGRES_DB: ${POSTGRES_DB:?}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    logging: *logging
+    networks: [backend]
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    # appendonly = write every change to disk, so data survives restarts.
+    command: ["redis-server", "--appendonly", "yes", "--requirepass", "${REDIS_PASSWORD:?}"]
+    environment:
+      REDISCLI_AUTH: ${REDIS_PASSWORD:?}
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging: *logging
+    networks: [backend]
+
+# Named volumes live outside containers and images. They survive stop, restart,
+# `docker compose down`, container recreation and image upgrades.
+# They are deleted ONLY by `docker compose down -v` or `docker volume rm` — never run those on a server.
+volumes:
+  pgdata:
+  redisdata:
+
+networks:
+  backend:

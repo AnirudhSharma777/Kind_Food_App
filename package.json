@@ -2,8 +2,9 @@
   "name": "my-app",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://localhost:5000",
   "engines": {
-    "node": "26.x"
+    "node": ">=20 <27"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.2.6",
