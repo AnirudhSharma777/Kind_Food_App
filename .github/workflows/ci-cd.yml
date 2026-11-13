@@ -6,6 +6,10 @@
 
 name: CI/CD
 
+
+
+name: CI/CD
+
 on:
   push:
     branches:
@@ -22,7 +26,6 @@ on:
 permissions:
   contents: read
 
-# Prevent unnecessary concurrent deployments on the same branch.
 concurrency:
   group: ci-cd-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
@@ -33,7 +36,7 @@ env:
 jobs:
 
   # ==========================================
-  # 1. TEST JOB
+  # 1. TEST
   # ==========================================
 
   test:
@@ -59,7 +62,6 @@ jobs:
       DATABASE_URL: postgresql://ci:ci@localhost:5432/ci?schema=public
 
     steps:
-
       - name: Checkout repository
         uses: actions/checkout@v5
 
@@ -72,19 +74,15 @@ jobs:
             package-lock.json
             server/package-lock.json
 
-      # --------------------------------------
       # Frontend
-      # --------------------------------------
 
       - name: Frontend - Install dependencies
         run: npm ci
 
-      - name: Frontend - Run unit tests
+      - name: Frontend - Run tests
         run: npx react-scripts test --watchAll=false --passWithNoTests
 
-      # --------------------------------------
       # Backend
-      # --------------------------------------
 
       - name: Backend - Install dependencies
         working-directory: server
@@ -98,10 +96,7 @@ jobs:
         working-directory: server
         run: npx prisma validate
 
-      # Apply migrations before tests if tests
-      # require the database schema to exist.
-
-      - name: Backend - Apply database migrations
+      - name: Backend - Apply migrations
         working-directory: server
         run: npx prisma migrate deploy
 
@@ -111,7 +106,7 @@ jobs:
 
 
   # ==========================================
-  # 2. BUILD AND PUSH DOCKER IMAGE
+  # 2. BUILD AND PUSH
   # ==========================================
 
   build:
@@ -121,22 +116,15 @@ jobs:
 
     outputs:
       image_tag: ${{ steps.tag.outputs.image_tag }}
-      image: ${{ env.IMAGE }}
 
     steps:
-
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      # Create immutable image tag using commit SHA.
-
-      - name: Generate Docker image tag
+      - name: Generate unique image tag
         id: tag
-        run: echo "image_tag=sha-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
-
-      # --------------------------------------
-      # Docker setup
-      # --------------------------------------
+        run: |
+          echo "image_tag=${GITHUB_REF_NAME}-sha-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -146,9 +134,8 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # --------------------------------------
-      # Docker Hub authentication
-      # --------------------------------------
+      # Login only for actual branch pushes.
+      # Pull Requests will build without publishing.
 
       - name: Log in to Docker Hub
         if: github.event_name == 'push'
@@ -157,11 +144,7 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # --------------------------------------
-      # Build and push image
-      # --------------------------------------
-
-      - name: Build and push Docker image
+      - name: Build Docker image
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -184,17 +167,21 @@ jobs:
   # 3. DEVELOPMENT DEPLOYMENT
   # ==========================================
 
-  # Uncomment this job when Development deployment is ready.
+  deploy-development:
+    name: Deploy Development
+    needs: build
 
-  # deploy-development:
-  #   name: Deploy Development
-  #   needs: build
-  #   if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
-  #   uses: ./.github/workflows/deploy.yml
-  #   with:
-  #     environment: development
-  #     image_tag: ${{ needs.build.outputs.image_tag }}
-  #   secrets: inherit
+    if: >
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/develop'
+
+    uses: ./.github/workflows/deploy.yml
+
+    with:
+      environment: development
+      image_tag: ${{ needs.build.outputs.image_tag }}
+
+    secrets: inherit
 
 
   # ==========================================
