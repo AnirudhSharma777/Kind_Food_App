@@ -1,0 +1,1 @@
+postgres = docker run -d --name kingfood-postgres -p 5432:5432 -e POSTGRES_USER=kingfood -e POSTGRES_PASSWORD=kingfood123 -e POSTGRES_DB=kingfood_db postgres:16

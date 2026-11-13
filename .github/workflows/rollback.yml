@@ -1,0 +1,29 @@
+# Manual rollback (or redeploy) of any image tag that already exists on Docker Hub.
+# Actions -> "Rollback / redeploy" -> Run workflow -> choose environment and tag.
+# The tag running before each deploy is in the server's .deployed-tag file and in
+# the GitHub "Deployments" history. Production still requires approval.
+name: Rollback / redeploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        type: choice
+        options: [development, uat, production]
+        required: true
+      image_tag:
+        description: Existing image tag, e.g. sha-1a2b3c4
+        type: string
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  rollback:
+    uses: ./.github/workflows/deploy.yml
+    with:
+      environment: ${{ inputs.environment }}
+      image_tag: ${{ inputs.image_tag }}
+    secrets: inherit

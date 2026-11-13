@@ -1,4 +1,6 @@
-const BASE_URL = "http://localhost:4000/api/v1";
+// Relative URL: in Docker the API and the frontend share one origin; in local dev
+// the CRA "proxy" setting in package.json forwards /api to the backend.
+export const BASE_URL = process.env.REACT_APP_API_URL || "/api/v1";
 
 
 
