@@ -3,24 +3,43 @@
 #   push to develop        -> test -> build & push sha-<commit>   (Development deploy disabled)
 #   push to uat            -> test -> build & push sha-<commit> -> deploy UAT
 #   push to main           -> test -> build & push sha-<commit> -> deploy Production
+
 name: CI/CD
 
 on:
   push:
-    branches: [develop, uat, main]
+    branches:
+      - develop
+      - uat
+      - main
+
   pull_request:
-    branches: [develop, uat, main]
+    branches:
+      - develop
+      - uat
+      - main
 
 permissions:
   contents: read
 
+# Prevent unnecessary concurrent deployments on the same branch.
+concurrency:
+  group: ci-cd-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 env:
-  IMAGE: ${{ vars.DOCKERHUB_IMAGE || 'local/kind-food-app' }}
+  IMAGE: ${{ vars.DOCKERHUB_IMAGE }}
 
 jobs:
+
+  # ==========================================
+  # 1. TEST JOB
+  # ==========================================
+
   test:
-    name: Test & validate
+    name: Test & Validate
     runs-on: ubuntu-latest
+
     services:
       postgres:
         image: postgres:16
@@ -28,16 +47,24 @@ jobs:
           POSTGRES_USER: ci
           POSTGRES_PASSWORD: ci
           POSTGRES_DB: ci
-        ports: ["5432:5432"]
+        ports:
+          - 5432:5432
         options: >-
           --health-cmd "pg_isready -U ci"
-          --health-interval 5s --health-timeout 5s --health-retries 10
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
     env:
       DATABASE_URL: postgresql://ci:ci@localhost:5432/ci?schema=public
-    steps:
-      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v5
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
         with:
           node-version-file: .nvmrc
           cache: npm
@@ -45,71 +72,122 @@ jobs:
             package-lock.json
             server/package-lock.json
 
-      - name: Frontend - install
+      # --------------------------------------
+      # Frontend
+      # --------------------------------------
+
+      - name: Frontend - Install dependencies
         run: npm ci
 
-      - name: Frontend - unit tests
+      - name: Frontend - Run unit tests
         run: npx react-scripts test --watchAll=false --passWithNoTests
 
-      - name: Backend - install
+      # --------------------------------------
+      # Backend
+      # --------------------------------------
+
+      - name: Backend - Install dependencies
         working-directory: server
         run: npm ci
 
-      - name: Backend - generate Prisma client and validate schema
+      - name: Backend - Generate Prisma client
         working-directory: server
-        run: npx prisma generate && npx prisma validate
+        run: npx prisma generate
 
-      - name: Backend - typecheck and tests
+      - name: Backend - Validate Prisma schema
         working-directory: server
-        run: npm test
+        run: npx prisma validate
 
-      - name: Backend - migrations apply cleanly to an empty database
+      # Apply migrations before tests if tests
+      # require the database schema to exist.
+
+      - name: Backend - Apply database migrations
         working-directory: server
         run: npx prisma migrate deploy
 
+      - name: Backend - Run tests
+        working-directory: server
+        run: npm test
+
+
+  # ==========================================
+  # 2. BUILD AND PUSH DOCKER IMAGE
+  # ==========================================
+
   build:
-    name: Build & push image
+    name: Build & Push Docker Image
     needs: test
     runs-on: ubuntu-latest
+
     outputs:
       image_tag: ${{ steps.tag.outputs.image_tag }}
-    steps:
-      - uses: actions/checkout@v5
+      image: ${{ env.IMAGE }}
 
-      - id: tag
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      # Create immutable image tag using commit SHA.
+
+      - name: Generate Docker image tag
+        id: tag
         run: echo "image_tag=sha-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
 
-      # Emulation so the runner (x86) can also build the ARM image for OCI Ampere A1.
-      - uses: docker/setup-qemu-action@v3
+      # --------------------------------------
+      # Docker setup
+      # --------------------------------------
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
         with:
           platforms: arm64
 
-      - uses: docker/setup-buildx-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # --------------------------------------
+      # Docker Hub authentication
+      # --------------------------------------
 
       - name: Log in to Docker Hub
         if: github.event_name == 'push'
         uses: docker/login-action@v3
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # Built ONCE per commit. Every environment deploys this exact image by its
-      # immutable sha tag; the branch tag (develop/uat/main) is just a convenience pointer.
-      # Multi-arch: OCI Ampere A1 (arm64) and AMD/Intel shapes (amd64) both pull the same tag.
-      - uses: docker/build-push-action@v6
+      # --------------------------------------
+      # Build and push image
+      # --------------------------------------
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
         with:
           context: .
           platforms: linux/amd64,linux/arm64
+
           push: ${{ github.event_name == 'push' }}
-          build-args: GIT_SHA=${{ github.sha }}
+
+          build-args: |
+            GIT_SHA=${{ github.sha }}
+
           tags: |
             ${{ env.IMAGE }}:${{ steps.tag.outputs.image_tag }}
             ${{ env.IMAGE }}:${{ github.event_name == 'pull_request' && github.base_ref || github.ref_name }}
+
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+
+  # ==========================================
+  # 3. DEVELOPMENT DEPLOYMENT
+  # ==========================================
+
+  # Uncomment this job when Development deployment is ready.
+
   # deploy-development:
-  #   name: Development
+  #   name: Deploy Development
   #   needs: build
   #   if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
   #   uses: ./.github/workflows/deploy.yml
@@ -118,25 +196,44 @@ jobs:
   #     image_tag: ${{ needs.build.outputs.image_tag }}
   #   secrets: inherit
 
-  # Push to the uat branch only.
+
+  # ==========================================
+  # 4. UAT DEPLOYMENT
+  # ==========================================
+
   deploy-uat:
-    name: UAT
+    name: Deploy UAT
     needs: build
-    if: github.event_name == 'push' && github.ref == 'refs/heads/uat'
+
+    if: >
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/uat'
+
     uses: ./.github/workflows/deploy.yml
+
     with:
       environment: uat
       image_tag: ${{ needs.build.outputs.image_tag }}
+
     secrets: inherit
 
-  # Push to the main branch only. If the "production" GitHub Environment has
-  # required reviewers, this job also waits for their approval.
+
+  # ==========================================
+  # 5. PRODUCTION DEPLOYMENT
+  # ==========================================
+
   deploy-production:
-    name: Production
+    name: Deploy Production
     needs: build
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    if: >
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main'
+
     uses: ./.github/workflows/deploy.yml
+
     with:
       environment: production
       image_tag: ${{ needs.build.outputs.image_tag }}
+
     secrets: inherit
