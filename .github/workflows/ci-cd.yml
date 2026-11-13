@@ -27,7 +27,10 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  IMAGE: ${{ vars.DOCKERHUB_IMAGE }}
+  # PR builds do not push, so they can use a local image name when the
+  # Docker Hub repository variable is not configured yet. Pushes are checked
+  # below and must provide the real Docker Hub image name.
+  IMAGE: ${{ vars.DOCKERHUB_IMAGE || 'local/kind-food-app' }}
 
 jobs:
 
@@ -116,12 +119,13 @@ jobs:
       # Validate Docker Hub image configuration
       - name: Validate Docker image configuration
         env:
-          DOCKER_IMAGE: ${{ vars.DOCKERHUB_IMAGE }}
+          DOCKER_IMAGE: ${{ env.IMAGE }}
+          EVENT_NAME: ${{ github.event_name }}
         run: |
           set -euo pipefail
 
-          if [ -z "$DOCKER_IMAGE" ]; then
-            echo "::error::DOCKERHUB_IMAGE is missing in GitHub repository variables."
+          if [ "$EVENT_NAME" = "push" ] && [ "$DOCKER_IMAGE" = "local/kind-food-app" ]; then
+            echo "::error::DOCKERHUB_IMAGE is required for push runs."
             exit 1
           fi
 
@@ -147,6 +151,7 @@ jobs:
           BRANCH="${BRANCH:0:110}"
 
           echo "image_tag=${BRANCH}-sha-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+          echo "branch_tag=${BRANCH}" >> "$GITHUB_OUTPUT"
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -175,6 +180,7 @@ jobs:
             GIT_SHA=${{ github.sha }}
           tags: |
             ${{ env.IMAGE }}:${{ steps.tag.outputs.image_tag }}
+            ${{ env.IMAGE }}:${{ steps.tag.outputs.branch_tag }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
