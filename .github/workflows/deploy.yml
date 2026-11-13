@@ -6,8 +6,8 @@
 #   vars:    SSH_HOST, SSH_USER, SSH_PORT (optional), DEPLOY_PATH (optional), PUBLIC_URL
 #   secrets: SSH_PRIVATE_KEY, SSH_KNOWN_HOSTS, APP_ENV_FILE
 # Repository level:
-#   vars:    DOCKERHUB_USERNAME, DOCKERHUB_IMAGE
-#   secrets: DOCKERHUB_TOKEN (read/write, CI push), DOCKERHUB_PULL_TOKEN (read-only, servers)
+#   vars:    DOCKERHUB_IMAGE
+#   secrets: DOCKER_USERNAME, DOCKER_PASSWORD (Docker Hub access token)
 
 # Reusable deployment workflow.
 # Called by ci-cd.yml and rollback.yml.
@@ -25,11 +25,11 @@
 #   APP_ENV_FILE
 #
 # Repository variables:
-#   DOCKERHUB_USERNAME
 #   DOCKERHUB_IMAGE
 #
 # Repository secrets:
-#   DOCKERHUB_PULL_TOKEN (read-only token for private images)
+#   DOCKER_USERNAME
+#   DOCKER_PASSWORD (Docker Hub access token)
 
 name: Deploy
 
@@ -198,12 +198,12 @@ jobs:
       # -----------------------------------------------
       - name: Login server to Docker Hub
         env:
-          DOCKERHUB_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKERHUB_PULL_TOKEN: ${{ secrets.DOCKER_PASSWORD }}
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKERHUB_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: |
           set -euo pipefail
 
-          if [ -z "$DOCKERHUB_PASSWORD" ]; then
+          if [ -z "$DOCKER_PASSWORD" ]; then
             echo "No pull token configured."
             echo "Skipping login (works for public images)."
             exit 0

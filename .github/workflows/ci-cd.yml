@@ -118,6 +118,8 @@ jobs:
         env:
           DOCKER_IMAGE: ${{ vars.DOCKERHUB_IMAGE }}
         run: |
+          set -euo pipefail
+
           if [ -z "$DOCKER_IMAGE" ]; then
             echo "::error::DOCKERHUB_IMAGE is missing in GitHub repository variables."
             exit 1
@@ -138,6 +140,11 @@ jobs:
           else
             BRANCH="$REF_NAME"
           fi
+
+          # Docker tags may not contain slashes or other ref-name characters.
+          BRANCH="$(printf '%s' "$BRANCH" | tr '[:upper:]' '[:lower:]' | sed 's#[^a-z0-9_.-]#-#g; s#^-*##; s#-*$##')"
+          BRANCH="${BRANCH:-branch}"
+          BRANCH="${BRANCH:0:110}"
 
           echo "image_tag=${BRANCH}-sha-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
 
@@ -168,7 +175,6 @@ jobs:
             GIT_SHA=${{ github.sha }}
           tags: |
             ${{ env.IMAGE }}:${{ steps.tag.outputs.image_tag }}
-            ${{ env.IMAGE }}:${{ github.event_name == 'pull_request' && github.base_ref || github.ref_name }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
