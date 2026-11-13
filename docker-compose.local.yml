@@ -1,0 +1,22 @@
+# Local override: build the image from source instead of pulling from Docker Hub,
+# and expose Postgres/Redis on localhost for DB tools.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.local.yml build
+#   docker compose -f docker-compose.yml -f docker-compose.local.yml run --rm migrate
+#   docker compose -f docker-compose.yml -f docker-compose.local.yml up -d
+services:
+  app:
+    build:
+      context: .
+    pull_policy: build
+
+  migrate:
+    pull_policy: never
+
+  postgres:
+    ports:
+      - "127.0.0.1:${LOCAL_POSTGRES_PORT:-5432}:5432"
+
+  redis:
+    ports:
+      - "127.0.0.1:${LOCAL_REDIS_PORT:-6379}:6379"

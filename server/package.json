@@ -10,6 +10,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "dev": "tsx watch src/server.ts",
+    "debug": "node --inspect=9229 --import tsx src/server.ts",
     "start": "node dist/server.js",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "prisma:generate": "prisma generate",
@@ -29,7 +30,8 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^5.1.0",
-    "nodemailer": "^10.5.0"
+    "nodemailer": "^10.5.0",
+    "prisma": "^6.19.3"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
@@ -37,7 +39,6 @@
     "@types/express": "^5.0.3",
     "@types/node": "^22.15.0",
     "@types/nodemailer": "^8.0.2",
-    "prisma": "^6.19.0",
     "tsx": "^4.19.4",
     "typescript": "^5.8.3"
   }

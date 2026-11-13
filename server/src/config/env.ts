@@ -43,6 +43,9 @@ export const env = {
   databaseUrl: required("DATABASE_URL"),
   corsOrigin: process.env.CORS_ORIGIN ?? "http://localhost:3000",
 
+  // Directory holding the compiled React app. Set in the Docker image; unset in local dev.
+  clientBuildDir: optional("CLIENT_BUILD_DIR"),
+
   // Public base URL of this API; used to build the link in activation emails.
   apiBaseUrl: (optional("API_BASE_URL") ?? `http://localhost:${resolvedPort}`).replace(/\/+$/, ""),
   activationTokenTtlMinutes: positiveInteger("ACTIVATION_TOKEN_TTL_MINUTES", 24 * 60),
