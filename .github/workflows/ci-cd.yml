@@ -1,7 +1,7 @@
 # Pipeline (a deploy runs only if test AND build of that same push succeeded)
-#   PR to develop/uat/main -> test + build image (not pushed)
-#   push to develop        -> test -> build & push sha-<commit>   (Development deploy disabled)
-#   push to uat            -> test -> build & push sha-<commit> -> deploy UAT
+#   PR to Develop/Uat/main -> test + build image (not pushed)
+#   push to Develop        -> test -> build & push sha-<commit>   (Development deploy disabled)
+#   push to Uat            -> test -> build & push sha-<commit> -> deploy UAT
 #   push to main           -> test -> build & push sha-<commit> -> deploy Production
 
 name: CI/CD
@@ -10,8 +10,8 @@ on:
   # Run whenever code reaches these branches
   push:
     branches:
-      - develop
-      - uat
+      - Develop
+      - Uat
       - main
 
   # Run validation when PRs are created or updated
@@ -21,8 +21,8 @@ on:
       - synchronize
       - reopened
     branches:
-      - develop
-      - uat
+      - Develop
+      - Uat
       - main
 
 permissions:
@@ -197,7 +197,7 @@ jobs:
   deploy-development:
     name: Deploy Development
     needs: build
-    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/Develop'
 
     uses: ./.github/workflows/deploy.yml
 
@@ -214,7 +214,7 @@ jobs:
   deploy-uat:
     name: Deploy UAT
     needs: build
-    if: github.event_name == 'push' && github.ref == 'refs/heads/uat'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/Uat'
 
     uses: ./.github/workflows/deploy.yml
 
