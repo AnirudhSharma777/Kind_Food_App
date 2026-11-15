@@ -4,9 +4,10 @@ import bcrypt from "bcrypt";
 import { prisma } from "../../config/database";
 import { env } from "../../config/env";
 import { sendMail } from "../../config/mailer";
-import type { RegisterUserBody, UpdateUserBody, UserListQuery } from "./user.types";
+import type { RegisterUserBody, RegisterUserWithRoleBody, RoleName, UpdateUserBody, UserListQuery, loginUserBody } from "./user.types";
 import { publicUserSelect } from "./user.types";
 import { HttpError } from "./user.validation";
+import jwt from "jsonwebtoken";
 
 const BCRYPT_ROUNDS = 12;
 const ACTIVATION_TOKEN_BYTES = 32;
@@ -65,12 +66,20 @@ function escapeHtml(value: string): string {
 // ---------------------------------------------------------------------------
 
 export async function registerUser(input: RegisterUserBody) {
+  return createRegisteredUser(input, "CUSTOMER");
+}
+
+export async function registerUserWithRole(input: RegisterUserWithRoleBody) {
+  return createRegisteredUser(input, input.role);
+}
+
+async function createRegisteredUser(input: RegisterUserBody, role: RoleName) {
   const passwordHash = await bcrypt.hash(input.password, BCRYPT_ROUNDS);
 
   // Create the user and its first token atomically, so we never end up with a
   // PENDING user that has no way to be activated. A duplicate email/phone
   // fails here with Prisma error P2002, which the controller maps to 409.
-  const { user, token } = await prisma.$transaction(async (tx) => {
+  const { user, token } = await prisma.$transaction(async (tx:any) => {
     const user = await tx.user.create({
       data: {
         email: input.email,
@@ -79,6 +88,11 @@ export async function registerUser(input: RegisterUserBody) {
         lastName: input.lastName,
         passwordHash,
         status: UserStatus.PENDING,
+        roles: {
+          create: {
+            role: { connect: { name: role } },
+          },
+        },
       },
       select: publicUserSelect,
     });
@@ -97,10 +111,50 @@ export async function registerUser(input: RegisterUserBody) {
   return user;
 }
 
+export async function loginUser(input: loginUserBody) {
+  const user = await prisma.user.findUnique({
+    where: { email: input.email},
+    select: {
+      ...publicUserSelect,
+      passwordHash: true,
+      roles: {
+        select: {
+          role: { select: { name: true } },
+        },
+      },
+    },
+  });
+
+  if (!user || !user.passwordHash){
+    throw new HttpError(401, "Invalid email or password");
+  }
+
+  const isMatch = await bcrypt.compare(input.password, user.passwordHash);
+
+  if(!isMatch){
+    throw new HttpError(401, "Invalid password");
+  }
+
+  if(user.status !== UserStatus.ACTIVE){
+    throw new HttpError(403, "Account is not active. Please activate your account.");
+  }
+
+  const roles = user.roles.map(({ role }) => role.name);
+  const token = jwt.sign(
+    { userId: user.id, roles },
+    env.jwtSecret,
+    { expiresIn: env.jwtExpiresIn as jwt.SignOptions["expiresIn"] },
+  );
+
+  const { passwordHash: _passwordHash, roles: _roles, ...publicUser } = user;
+
+  return { user: publicUser, token };
+}
+
 export async function activateAccount(token: string) {
   const now = new Date();
 
-  return prisma.$transaction(async (tx) => {
+  return prisma.$transaction(async (tx:any) => {
     const record = await tx.activationToken.findUnique({
       where: { tokenHash: hashToken(token) },
       select: { id: true, userId: true, expiresAt: true, usedAt: true },
@@ -181,7 +235,7 @@ export async function resendActivation(email: string): Promise<void> {
     return;
   }
 
-  const token = await prisma.$transaction(async (tx) => {
+  const token = await prisma.$transaction(async (tx:any) => {
     // Only the newest link should work.
     await tx.activationToken.deleteMany({ where: { userId: user.id, usedAt: null } });
     return issueActivationToken(tx, user.id);

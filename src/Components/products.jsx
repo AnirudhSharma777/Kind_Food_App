@@ -1,5 +1,6 @@
 import React from 'react'
-import { Container, Row,Col } from 'react-bootstrap'
+import { Container } from 'react-bootstrap'
+import { FaArrowRight } from 'react-icons/fa'
 import img1 from '../assets/Apple.png'
 import img2 from '../assets/dessart.webp'
 import img3 from '../assets/Avocado.webp'
@@ -51,35 +52,34 @@ const products = () => {
         },
     ]
     return (
-        <div >
-            <Container className='promo-categories'>
-                <Row>
-                    <div className='text-center mb-4'>
+        <div className='home-discovery'>
+            <section className='promo-categories'>
+                <Container>
+                    <div className='category-section-heading text-center'>
                         <span className='eyebrow'>Find your favorite</span>
                         <h2 className="section-heading">Popular categories</h2>
+                        <p>Pick a craving and find something you’ll love.</p>
                     </div>
-                    <Col className="pb-4">
-                        <div className='category-list'>
+                    <div className='category-list'>
                         {
-                            category.map((item,id) => {
+                            category.map((item) => {
                                 return (
-                                    <a className='category-link' key={id} href={item.link}>
-                                            <img className='img' src={item.image} alt="category" />
-                                            <span>{item.title}</span>
+                                    <a className='category-link' key={item.id} href={item.link}>
+                                            <span className='category-image-wrap'>
+                                                <img className='img' src={item.image} alt="" />
+                                            </span>
+                                            <span className='category-link-label'>{item.title}</span>
+                                            <FaArrowRight className='category-link-arrow' aria-hidden='true' />
                                     </a>
                                 )
                             })
                         }
-                        </div>
-                    </Col>
-
-                </Row>
-            </Container>
-            <div className='mt-5 mb-4'>
-                <Container fluid>
-                    <RecipeCard />
+                    </div>
                 </Container>
-            </div>
+            </section>
+            <section className='recipe-section'>
+                <RecipeCard />
+            </section>
         </div>
     )
 }

@@ -1,50 +1,39 @@
 import React from "react";
-import { Card, Badge, Row, Col, Container } from "react-bootstrap";
-import { FaClock, FaCalendarDay, FaComment } from "react-icons/fa";
+import { Card, Badge } from "react-bootstrap";
+import { FaClock, FaComment } from "react-icons/fa";
 import { recipeCardData } from "../Data/recipecard"
 
 function subCard() {
   return (
-    <Container>
-      <Row className="">
+    <div className="recipe-list">
         {recipeCardData.map((item) => (
           <Card
             key={item.id}
             id={item.category === 'Bakery' ? 'bakery' : item.category === 'Vegetarian' ? 'vegetarian' : undefined}
-            className="recipe-card container-fluid d-flex flex-lg-row flex-column"
+            className="recipe-card"
           >
-            <Col md={4} lg={3}>
               <Card.Img src={item.image} alt={item.title} className="recipe-image" />
-            </Col>
-            <Col md={8} lg={9}>
-              <Card.Body>
+              <Card.Body className="recipe-card-body">
+                <span className="recipe-card-kicker">A little kitchen inspiration</span>
                 <Card.Title>
-                  <Badge className="rating-badge me-2">
-                    {item.category}
-                  </Badge>
-                  {item.title}
+                  <span>{item.title}</span>
+                  <Badge className="recipe-category-badge">{item.category}</Badge>
                 </Card.Title>
                 <Card.Text>{item.description}</Card.Text>
-                <div>
-                  <div className="d-flex align-items-center">
+                <div className="recipe-card-meta">
+                  <span>
                     <FaClock className="me-2" />
-                    <Card.Text>{item.timerange}</Card.Text>
-                  </div>
-                  <div className="d-flex align-items-center ">
-                    <FaCalendarDay className="me-2" />
-                    <Card.Text className="mt-2">{item.date}</Card.Text>
-                    <div className="d-flex align-items-center ms-4">
-                      <FaComment className="me-2" />
-                      <Card.Text>{item.comment}</Card.Text>
-                    </div>
-                  </div>
+                    {item.timerange}
+                  </span>
+                  <span>
+                    <FaComment className="me-2" />
+                    {item.comment} comments
+                  </span>
                 </div>
               </Card.Body>
-            </Col>
           </Card>
         ))}
-      </Row>
-    </Container>
+    </div>
   );
 }
 
