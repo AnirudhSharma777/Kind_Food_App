@@ -1,0 +1,65 @@
+-- AlterTable
+ALTER TABLE "Address" ALTER COLUMN "id" DROP DEFAULT;
+
+-- AlterTable
+ALTER TABLE "Cart" ALTER COLUMN "id" DROP DEFAULT;
+
+-- AlterTable
+ALTER TABLE "CartItem" ALTER COLUMN "id" DROP DEFAULT;
+
+-- AlterTable
+ALTER TABLE "Category" ALTER COLUMN "id" DROP DEFAULT;
+
+-- AlterTable
+ALTER TABLE "Commission" ALTER COLUMN "id" DROP DEFAULT;
+
+-- AlterTable
+ALTER TABLE "Coupon" ALTER COLUMN "id" DROP DEFAULT;
+
+-- AlterTable
+ALTER TABLE "CouponRedemption" ALTER COLUMN "id" DROP DEFAULT;
+
+-- AlterTable
+ALTER TABLE "Delivery" ALTER COLUMN "id" DROP DEFAULT;
+
+-- AlterTable
+ALTER TABLE "Inventory" ALTER COLUMN "id" DROP DEFAULT;
+
+-- AlterTable
+ALTER TABLE "Notification" ALTER COLUMN "id" DROP DEFAULT;
+
+-- AlterTable
+ALTER TABLE "Order" ALTER COLUMN "id" DROP DEFAULT;
+
+-- AlterTable
+ALTER TABLE "OrderItem" ALTER COLUMN "id" DROP DEFAULT;
+
+-- AlterTable
+ALTER TABLE "Payment" ALTER COLUMN "id" DROP DEFAULT;
+
+-- AlterTable
+ALTER TABLE "Payout" ALTER COLUMN "id" DROP DEFAULT;
+
+-- AlterTable
+ALTER TABLE "Permission" ALTER COLUMN "id" DROP DEFAULT;
+
+-- AlterTable
+ALTER TABLE "Product" ALTER COLUMN "id" DROP DEFAULT;
+
+-- AlterTable
+ALTER TABLE "ProductVariant" ALTER COLUMN "id" DROP DEFAULT;
+
+-- AlterTable
+ALTER TABLE "Restaurant" ALTER COLUMN "id" DROP DEFAULT;
+
+-- AlterTable
+ALTER TABLE "Review" ALTER COLUMN "id" DROP DEFAULT;
+
+-- AlterTable
+ALTER TABLE "Role" ALTER COLUMN "id" DROP DEFAULT;
+
+-- AlterTable
+ALTER TABLE "Store" ALTER COLUMN "id" DROP DEFAULT;
+
+-- AlterTable
+ALTER TABLE "User" ALTER COLUMN "id" DROP DEFAULT;

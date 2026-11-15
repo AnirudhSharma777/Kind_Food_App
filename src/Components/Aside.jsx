@@ -1,222 +1,78 @@
 import React from "react";
-import { Container, ListGroup, Row, Col, Button, Card, Badge } from "react-bootstrap";
-import { FaFacebookF, FaTwitter, FaInstagram, FaGoogle } from "react-icons/fa";
-import { MDBBadge } from 'mdb-react-ui-kit';
+import { Badge, Button, Card, ListGroup } from "react-bootstrap";
+import { FaFacebookF, FaTwitter, FaInstagram, FaGoogle, FaLeaf } from "react-icons/fa";
 
+const ingredients = [
+  ["Apple", "23"],
+  ["Banana", "9"],
+  ["Berries", "50"],
+  ["Cabbage", "19"],
+  ["Citrus", "29"],
+  ["Corn", "18"],
+  ["Cucumber", "25"],
+  ["Egg", "14"],
+  ["Herbs", "27"],
+  ["Potato", "29"],
+  ["Tomatoes", "32"],
+  ["Watermelon", "9"],
+];
+
+const tags = ["bakery", "cookbook", "cuisine", "asianfood", "tips", "recipe", "chef", "vegetarian"];
+
+const featuredRecipe = {
+  image: "https://media.istockphoto.com/id/1444282976/photo/the-concept-of-healthy-tasty-desserts-tropical-chia-pudding-with-mango-flavor-in-a-glass.webp?b=1&s=170667a&w=0&k=20&c=yg0mzf_Z2YpmqpO6XiAp8IsO8kD86_TAfFqxvEDEzM0=",
+  title: "Mango Yogurt",
+  author: "Amalie Mayer",
+};
 
 function Aside() {
-  const recipes = [
-    // {
-    //   image:
-    //     "https://images.unsplash.com/photo-1576618148400-f54bed99fcfd?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTl8fFN3ZWV0JTIwQ3JlYW0lMjBDdXBjYWtlfGVufDB8fDB8fHww",
-    //   title: "Sweet Cream Cupcake",
-    //   author: "Amalie Mayer",
-    // },
-    // {
-    //   image:
-    //     "https://media.istockphoto.com/id/1371994396/photo/delicious-egg-muffins-with-green-onions-bacon-cheese-and-tomatoes-on-wooden-board-on-old.webp?b=1&s=170667a&w=0&k=20&c=aYsaeX8h0w8s_E_nA22Pz-v66LGIKR6u6MygrkkCOro=",
-    //   title: "Egg Muffins",
-    //   author: "Amalie Mayer",
-    // },
-    {
-      image:
-        "https://media.istockphoto.com/id/1444282976/photo/the-concept-of-healthy-tasty-desserts-tropical-chia-pudding-with-mango-flavor-in-a-glass.webp?b=1&s=170667a&w=0&k=20&c=yg0mzf_Z2YpmqpO6XiAp8IsO8kD86_TAfFqxvEDEzM0=",
-      title: "Mango Yogurt",
-      author: "Amalie Mayer",
-    },
-  ];
-
   return (
-    <aside className="recipe-sidebar py-3">
-      <Container>
-        <ListGroup className="ingredient-list">
-          <ListGroup.Item>
-            <span className="me-2">
-              <i className="bi bi-apple"></i>
-            </span>
-            Apple <span className="text-muted"><MDBBadge className='ms-2' color='danger'>
-        23
-      </MDBBadge></span>
-          </ListGroup.Item>
-          <ListGroup.Item>
-            <span className="me-2">
-              <i className="bi bi-banana"></i>
-            </span>
-            Banana <span className="text-muted">
-              <MDBBadge className='ms-2' color='danger'>
-                9
-              </MDBBadge>
-            </span>
-          </ListGroup.Item>
-          <ListGroup.Item>
-            <span className="me-2">
-              <i className="bi bi-berry"></i>
-            </span>
-            Berries <span className="text-muted">
-            <MDBBadge className='ms-2' color='danger'>
-        50
-      </MDBBadge>
-            </span>
-          </ListGroup.Item>
-          <ListGroup.Item>
-            <span className="me-2">
-              <i className="bi bi-carrot"></i>
-            </span>
-            Cabbage <span className="text-muted">
-            <MDBBadge className='ms-2' color='danger'>
-        19
-      </MDBBadge>
-            </span>
-          </ListGroup.Item>
-          <ListGroup.Item>
-            <span className="me-2">
-              <i className="bi bi-lemon"></i>
-            </span>
-            Citrus <span className="text-muted"><MDBBadge className='ms-2' color='danger'>
-        29
-      </MDBBadge></span>
-          </ListGroup.Item>
-          <ListGroup.Item>
-            <span className="me-2">
-              <i className="bi bi-corn"></i>
-            </span>
-            Corn <span className="text-muted">
-            <MDBBadge className='ms-2' color='danger'>
-        18
-      </MDBBadge>
-            </span>
-          </ListGroup.Item>
-          <ListGroup.Item>
-            <span className="me-2">
-              <i className="bi bi-cucumber"></i>
-            </span>
-            Cucumber <span className="text-muted">
-            <MDBBadge className='ms-2' color='danger'>
-        25
-      </MDBBadge>
-            </span>
-          </ListGroup.Item>
-          <ListGroup.Item>
-            <span className="me-2">
-              <i className="bi bi-egg"></i>
-            </span>
-            Egg <span className="text-muted">
-            <MDBBadge className='ms-2' color='danger'>
-        14
-      </MDBBadge>
-            </span>
-          </ListGroup.Item>
-          <ListGroup.Item>
-            <span className="me-2">
-              <i className="bi bi-flower"></i>
-            </span>
-            Herbs <span className="text-muted">
-            <MDBBadge className='ms-2' color='danger'>
-        27
-      </MDBBadge>
-            </span>
-          </ListGroup.Item>
-          <ListGroup.Item>
-            <span className="me-2">
-              <i className="bi bi-potato"></i>
-            </span>
-            Potato <span className="text-muted">
-            <MDBBadge className='ms-2' color='danger'>
-       29
-      </MDBBadge>
-            </span>
-          </ListGroup.Item>
-          <ListGroup.Item>
-            <span className="me-2">
-              <i className="bi bi-tomato"></i>
-            </span>
-            Tomatoes <span className="text-muted">
-            <MDBBadge className='ms-2' color='danger'>
-        32
-      </MDBBadge>
-            </span>
-          </ListGroup.Item>
-          <ListGroup.Item>
-            <span className="me-2">
-              <i className="bi bi-watermelon"></i>
-            </span>
-            Watermelon <span className="text-muted">
-            <MDBBadge className='ms-2' color='danger'>
-        9
-      </MDBBadge>
-            </span>
-          </ListGroup.Item>
-        </ListGroup>
-        <h3 className="recipe-sidebar-title mt-4">Popular recipes</h3>
-        <Row  className="g-3 d-flex flex-row">
-          {recipes.map((recipe, index) => (
-           <Col key={index} className="w-100">
-           <Card className="d-flex flex-row">
-             <Card.Img
-               variant="top"
-               src={recipe.image}
-               className="w-25 img2"
-               style={{ objectFit: "cover" }}
-             />
-             <Card.Body>
-               <Card.Title>{recipe.title}</Card.Title>
-               {/* <Card.Text>By {recipe.author}</Card.Text> */}
-             </Card.Body>
-           </Card>
-         </Col>
-          ))}
-        </Row>
-        <h3 className="recipe-sidebar-title mb-3 mt-4">Popular tags</h3>
-        <Row className=" ">
-          <Col xs={6} md={6} lg={3} className="d-flex flex-wrap w-100 gap-3">
-            <Badge className=" mb-3">
-              #bakery
-            </Badge>
-
-            <Badge className=" mb-3">
-              #cookbook
-            </Badge>
-
-            <Badge className="mb-3">
-              #cuisine
-            </Badge>
-            <Badge className=" mb-3">
-              #asianfood
-            </Badge>
-
-            <Badge className=" mb-3">
-              #tips
-            </Badge>
-
-            <Badge className=" mb-3">
-              #recipe
-            </Badge>
-
-            <Badge className=" mb-3">
-              #chef
-            </Badge>
-
-            <Badge className=" mb-3">
-              #vegetarian
-            </Badge>
-          </Col>
-        </Row>
-        <h3 className="recipe-sidebar-title mb-3 mt-4">Follow us</h3>
-        <div className="social-media">
-          <Button variant="outline-primary" className="me-2">
-            <FaFacebookF />
-          </Button>
-          <Button variant="outline-info" className="me-2">
-            <FaTwitter />
-          </Button>
-          <Button variant="outline-danger" className="me-2">
-            <FaInstagram />
-          </Button>
-          <Button variant="outline-secondary">
-            <FaGoogle />
-          </Button>
+    <aside className="recipe-sidebar">
+      <div className="ingredient-heading">
+        <span className="ingredient-heading-icon"><FaLeaf aria-hidden="true" /></span>
+        <div>
+          <h2 className="recipe-sidebar-title">Browse ingredients</h2>
+          <p>Find a little inspiration in everyday favorites.</p>
         </div>
-      </Container>
+      </div>
+
+      <ListGroup className="ingredient-list">
+        {ingredients.map(([name, count]) => (
+          <ListGroup.Item key={name}>
+            <span>{name}</span>
+            <Badge>{count}</Badge>
+          </ListGroup.Item>
+        ))}
+      </ListGroup>
+
+      <section className="sidebar-featured">
+        <h3 className="recipe-sidebar-title">Popular recipe</h3>
+        <Card className="featured-recipe-card">
+          <Card.Img src={featuredRecipe.image} alt={featuredRecipe.title} />
+          <Card.Body>
+            <span>Reader favorite</span>
+            <Card.Title>{featuredRecipe.title}</Card.Title>
+            <Card.Text>By {featuredRecipe.author}</Card.Text>
+          </Card.Body>
+        </Card>
+      </section>
+
+      <section className="sidebar-tags">
+        <h3 className="recipe-sidebar-title">Popular tags</h3>
+        <div className="recipe-tags">
+          {tags.map((tag) => <Badge key={tag}>#{tag}</Badge>)}
+        </div>
+      </section>
+
+      <section className="sidebar-social">
+        <h3 className="recipe-sidebar-title">Follow us</h3>
+        <div className="social-media">
+          <Button variant="outline-primary" aria-label="Facebook"><FaFacebookF /></Button>
+          <Button variant="outline-info" aria-label="Twitter"><FaTwitter /></Button>
+          <Button variant="outline-danger" aria-label="Instagram"><FaInstagram /></Button>
+          <Button variant="outline-secondary" aria-label="Google"><FaGoogle /></Button>
+        </div>
+      </section>
     </aside>
   );
 }

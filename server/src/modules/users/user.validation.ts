@@ -1,11 +1,20 @@
 import { UserStatus } from "@prisma/client";
-import type { RegisterUserBody, UpdateUserBody, UserListQuery } from "./user.types";
+import { roleNames } from "./user.types";
+import type {
+  loginUserBody,
+  RegisterUserBody,
+  RegisterUserWithRoleBody,
+  RoleName,
+  UpdateUserBody,
+  UserListQuery,
+} from "./user.types";
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 // Activation tokens are 32 random bytes encoded as base64url (43 chars).
 const activationTokenPattern = /^[A-Za-z0-9_-]{43}$/;
 const statuses = new Set<string>(Object.values(UserStatus));
+const roles = new Set<string>(roleNames);
 
 export class HttpError extends Error {
   constructor(
@@ -83,12 +92,33 @@ export function parseUserId(value: string): string {
 export function parseRegisterUserBody(input: unknown): RegisterUserBody {
   const body = asObject(input);
   const allowedFields = ["email", "password", "phone", "firstName", "lastName"];
+  validateAllowedFields(body, allowedFields);
+  return parseRegistrationFields(body);
+}
+
+export function parseRegisterUserWithRoleBody(input: unknown): RegisterUserWithRoleBody {
+  const body = asObject(input);
+  const allowedFields = ["email", "password", "phone", "firstName", "lastName", "role"];
+  validateAllowedFields(body, allowedFields);
+
+  const role = body.role;
+
+  if (typeof role !== "string" || !roles.has(role)) {
+    throw new RequestValidationError(`role must be one of: ${roleNames.join(", ")}`);
+  }
+
+  return { ...parseRegistrationFields(body), role: role as RoleName };
+}
+
+function validateAllowedFields(body: Record<string, unknown>, allowedFields: string[]): void {
   const unknownFields = Object.keys(body).filter((field) => !allowedFields.includes(field));
 
   if (unknownFields.length > 0) {
     throw new RequestValidationError(`Unsupported fields: ${unknownFields.join(", ")}`);
   }
+}
 
+function parseRegistrationFields(body: Record<string, unknown>): RegisterUserBody {
   const password = body.password;
 
   // bcrypt silently ignores everything past 72 *bytes*, so measure bytes, not characters.
@@ -172,4 +202,20 @@ export function parseUserListQuery(query: Record<string, unknown>): UserListQuer
     status: status as UserStatus | undefined,
     search: queryString(query.search),
   };
+}
+
+export function parseLoginUserBody(input: loginUserBody) {
+  const body = asObject(input);
+  return {
+    email: parseEmail(body.email),
+    password: parsePassword(body.password),
+  };
+}
+
+function parsePassword(password: unknown): string {
+  if (typeof password !== "string" || password.length < 8 || Buffer.byteLength(password, "utf8") > 72) {
+    throw new RequestValidationError("password must be at least 8 characters and at most 72 bytes");
+  }
+
+  return password;
 }
