@@ -1,135 +1,138 @@
-import React, { useState } from 'react';
-import { Form, Button, Modal, ModalBody } from 'react-bootstrap';
-import { FaFacebookF, FaTwitter, FaInstagram, FaGoogle } from 'react-icons/fa';
-import {AiOutlineEyeInvisible, AiOutlineEye} from 'react-icons/ai';
-import { useNavigate } from 'react-router-dom';
-import {useDispatch} from 'react-redux'
-import  {SignIn} from '../Services/operation/authApi'
-import {setLoginData} from '../Redux/slices/authSlice'
-import toast from 'react-hot-toast';
+import { useState } from "react";
+import { Button, Form, Modal } from "react-bootstrap";
+import { FiArrowRight, FiCheckCircle, FiEye, FiEyeOff, FiLock, FiMail, FiX } from "react-icons/fi";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+import { SignIn, getApiErrorMessage } from "../Services/operation/authApi";
+import { setLoginData, setToken, setUser } from "../Redux/slices/authSlice";
+
+const initialForm = { email: "", password: "" };
 
 function Login({ open, onOpen, onClose, onSwitchToSignup }) {
-
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-
+  const [formData, setFormData] = useState(initialForm);
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const {email, password } = formData;
-  
-  const handleOnChange = (e) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      [e.target.name] : e.target.value,
-    }))
-  }
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setFormData((current) => ({ ...current, [name]: value }));
+  };
 
-  const handleOnSubmit = (e) => {
-    e.preventDefault();
-    dispatch(setLoginData(formData))
-    SignIn(formData).then(() =>{
-      toast.success('login successfully');
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      const { token, user } = await SignIn(formData);
+
+      dispatch(setToken(token));
+      dispatch(setUser(user));
+      dispatch(setLoginData(user));
+      localStorage.setItem("token", JSON.stringify(token));
+      localStorage.setItem("user", JSON.stringify(user));
+
+      toast.success(`Welcome back${user.firstName ? `, ${user.firstName}` : ""}!`);
+      setFormData(initialForm);
       onClose();
-      navigate('/');
-    }).catch((error) =>{
-      toast.error(error.response.data.message);
-    })
-  }
-
-
+      navigate("/");
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, "We could not sign you in. Please try again."));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <>
-    <Button onClick={onOpen} variant="outline-primary" size="sm">Sign in</Button>
-    <Modal
-      show={open} onHide={onClose}
-      aria-labelledby="sign-in-title"
-    >
-      <Modal.Header closeButton>
-        <Modal.Title id="sign-in-title">Welcome back</Modal.Title>
-      </Modal.Header>
-      <ModalBody>
-            <p className="text-muted mb-4">Sign in to continue to your account.</p>
-            <Form onSubmit={handleOnSubmit}>
-              <Form.Group className="mb-3" controlId="sign-in-email">
-                  <Form.Label>Email</Form.Label>
-                  <Form.Control
-                    type="email"
-                    placeholder="Enter your email"
-                    value={email}
-                    name='email'
-                    onChange={handleOnChange}
-                  />
-                </Form.Group>
-                <Form.Group className="mb-3" controlId="sign-in-password">
-                  <Form.Label>Password</Form.Label>
-                  <div className="password-field">
-                  <Form.Control
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Enter your password"
-                    value={password}
-                    name="password"
-                    onChange={handleOnChange}
-                  />
-                  <button type="button" className="password-toggle" aria-label={showPassword ? "Hide password" : "Show password"} onClick={() => setShowPassword((prev) => !prev)}>
-                  {
-                    !showPassword ? (
-                      <AiOutlineEyeInvisible fontSize={24} fill="#AFB2BF" />
-                    ) :
-                      (
-                        <AiOutlineEye fontSize={24} fill="#AFB2BF" />
-                      )
-                  }
-                  </button>
-                  </div>
-                </Form.Group>
-                <Form.Group className="mb-3">
-                  <Form.Check
-                    type="checkbox"
-                    label="Remember me"
-                    checked={rememberMe}
-                    onChange={() => setRememberMe(!rememberMe)}
-                  />
-                </Form.Group>
-                <Button type="submit" variant="primary" className="w-100">
-                  Sign In
-                </Button>
-              </Form>
-              <div className="text-center mt-4">
-                <p className="text-muted">
-                  Don't have an account? 
-                  {/* <Link to={<Signup/>}>
-                  SignUp
-                  </Link> */}
-                  <button type="button" className="btn btn-link p-0 align-baseline" onClick={onSwitchToSignup}>Sign up</button>
-                </p>
-                <p className="text-muted">
-                  Forgot your password? <button type="button" className="btn btn-link p-0 align-baseline">Reset password</button>
-                </p>
-                <div className="social-media">
-                  <Button variant="outline-primary" className="me-2">
-                    <FaFacebookF />
-                  </Button>
-                  <Button variant="outline-info" className="me-2">
-                    <FaTwitter />
-                  </Button>
-                  <Button variant="outline-danger" className="me-2">
-                    <FaInstagram />
-                  </Button>
-                  <Button variant="outline-secondary">
-                    <FaGoogle />
-                  </Button>
-                </div>
+      <Button onClick={onOpen} variant="outline-primary" size="sm" className="auth-trigger">
+        Sign in
+      </Button>
+
+      <Modal
+        show={open}
+        onHide={onClose}
+        centered
+        aria-labelledby="sign-in-title"
+        dialogClassName="auth-dialog"
+        contentClassName="auth-modal"
+      >
+        <section className="auth-aside auth-aside-login">
+          <span className="auth-logo-mark">KF</span>
+          <p className="auth-aside-kicker">Kind Food account</p>
+          <h2>Good food starts with a good day.</h2>
+          <p>Sign in to keep your favourite dishes, addresses and orders close at hand.</p>
+          <ul className="auth-benefit-list">
+            <li><FiCheckCircle aria-hidden="true" /> Faster checkout</li>
+            <li><FiCheckCircle aria-hidden="true" /> Track every order</li>
+            <li><FiCheckCircle aria-hidden="true" /> Save your favourites</li>
+          </ul>
+        </section>
+
+        <section className="auth-form-panel">
+          <button type="button" className="auth-close" onClick={onClose} aria-label="Close sign in dialog">
+            <FiX aria-hidden="true" />
+          </button>
+          <p className="auth-kicker">Welcome back</p>
+          <h1 id="sign-in-title">Sign in to Kind Food</h1>
+          <p className="auth-subtitle">Enter your details to continue your food journey.</p>
+
+          <Form onSubmit={handleSubmit} className="auth-form">
+            <Form.Group controlId="sign-in-email">
+              <Form.Label>Email address</Form.Label>
+              <div className="auth-input-wrap">
+                <FiMail aria-hidden="true" />
+                <Form.Control
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="you@example.com"
+                  autoComplete="email"
+                  required
+                />
               </div>
-        </ModalBody>
+            </Form.Group>
+
+            <Form.Group controlId="sign-in-password">
+              <Form.Label>Password</Form.Label>
+              <div className="auth-input-wrap auth-password-wrap">
+                <FiLock aria-hidden="true" />
+                <Form.Control
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Enter your password"
+                  autoComplete="current-password"
+                  minLength="8"
+                  required
+                />
+                <button
+                  type="button"
+                  className="auth-password-toggle"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  onClick={() => setShowPassword((visible) => !visible)}
+                >
+                  {showPassword ? <FiEyeOff aria-hidden="true" /> : <FiEye aria-hidden="true" />}
+                </button>
+              </div>
+            </Form.Group>
+
+            <Button type="submit" className="auth-submit" disabled={isSubmitting}>
+              {isSubmitting ? "Signing in…" : <>Sign in <FiArrowRight aria-hidden="true" /></>}
+            </Button>
+          </Form>
+
+          <p className="auth-switch-copy">
+            New to Kind Food? <button type="button" onClick={onSwitchToSignup}>Create an account</button>
+          </p>
+        </section>
       </Modal>
-      </>
+    </>
   );
 }
 
-export default Login
+export default Login;

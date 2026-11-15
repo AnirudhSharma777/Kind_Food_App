@@ -20,14 +20,16 @@ import img5 from '../../assets/upper5.jpg'
 import img6 from '../../assets/upper6.jpg'
 
 
-//Card
+const inspirationImages = [img1, img2, img3, img4, img5, img6];
+
 const ImageSlider = () => {
     return (
         <section className='instagram-section'>
             <Container>
-                <div className='text-center mb-4'>
+                <div className='inspiration-heading text-center'>
                     <span className='eyebrow'>From our kitchen</span>
                     <h2 className='section-heading'>A little inspiration for your next bite</h2>
+                    <p>Colorful ideas and fresh flavors to bring to your table.</p>
                 </div>
                 <Swiper
                     slidesPerView={1}
@@ -43,9 +45,12 @@ const ImageSlider = () => {
                     className="instagram-slider"
                 >
                     {
-                        [img1, img2, img3, img4, img5, img6].map((item, id) => (
+                        inspirationImages.map((item, id) => (
                             <SwiperSlide key={id}>
-                                <img src={item} alt={`Food inspiration ${id + 1}`} className='instagram-image' />
+                                <div className='inspiration-card'>
+                                    <img src={item} alt={`Food inspiration ${id + 1}`} className='instagram-image' />
+                                    <span className='inspiration-card-label'>Kitchen inspiration <b>{String(id + 1).padStart(2, '0')}</b></span>
+                                </div>
                             </SwiperSlide>
                         ))
                     }

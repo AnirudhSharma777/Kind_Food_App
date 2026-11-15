@@ -5,15 +5,26 @@ import Signup from '../../Pages/Signup'
 import Login from '../../Pages/Login'
 import { FaBars, FaShoppingBag, FaTimes } from "react-icons/fa"
 import { MDBBadge } from 'mdb-react-ui-kit';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
+import { setToken, setUser } from '../../Redux/slices/authSlice';
 
 export const Header = () => {
     const [activeAuthModal, setActiveAuthModal] = useState(null);
     const [expanded, setExpanded] = useState(false);
+    const dispatch = useDispatch();
     const {totalItems} = useSelector((state) => state.cart);
-    const { token } = useSelector((state) => state.auth);
+    const { token, user } = useSelector((state) => state.auth);
     const closeMenu = () => setExpanded(false);
+    const handleLogout = () => {
+        dispatch(setToken(null));
+        dispatch(setUser(null));
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        closeMenu();
+        toast.success('You have been signed out');
+    };
 
     return (
         <Navbar className='site-header' expand="lg" expanded={expanded} onToggle={setExpanded}>
@@ -90,9 +101,12 @@ export const Header = () => {
                             }
                              {
                                 token !== null && (
-                                    <div className='d-flex gap-2'>
-                                         <Button as={Link} to='/dashboard'>Dashboard</Button>
-                                        {/* <Button className='shadow' onClick={handleOnLogout}>LogOut</Button> */}
+                                    <div className='auth-nav-user'>
+                                        <span>
+                                            <small>Signed in as</small>
+                                            {user?.firstName || user?.email || 'Kind Food member'}
+                                        </span>
+                                        <Button type='button' variant='outline-primary' size='sm' onClick={handleLogout}>Sign out</Button>
                                     </div>
                             )
                             }

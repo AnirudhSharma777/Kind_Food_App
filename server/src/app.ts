@@ -3,6 +3,7 @@ import express from "express";
 import { env } from "./config/env";
 import { healthRouter } from "./modules/health/health.routes";
 import { userRouter } from "./modules/users/user.routes";
+import { storeRouter } from "./modules/store/store.routes";
 
 export const app = express();
 
@@ -12,10 +13,10 @@ app.use(express.json({ limit: "1mb" }));
 
 app.use("/api/v1/health", healthRouter);
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1/stores", storeRouter);
 
 if (env.clientBuildDir) {
-  // Production image: serve the compiled React app from the same origin as the API,
-  // so the frontend can call "/api/v1" without a per-environment build.
+  
   const clientBuildDir = env.clientBuildDir;
   app.use(express.static(clientBuildDir, { index: false, maxAge: "1h" }));
 

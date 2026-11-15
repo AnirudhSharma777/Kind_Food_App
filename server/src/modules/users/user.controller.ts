@@ -3,10 +3,12 @@ import {
   HttpError,
   parseActivationToken,
   parseRegisterUserBody,
+  parseRegisterUserWithRoleBody,
   parseResendActivationBody,
   parseUpdateUserBody,
   parseUserId,
   parseUserListQuery,
+  parseLoginUserBody,
 } from "./user.validation";
 import {
   activateAccount,
@@ -14,9 +16,13 @@ import {
   findUserById,
   listUsers,
   registerUser,
+  registerUserWithRole,
   resendActivation,
   updateUser,
+  loginUser,
 } from "./user.service";
+
+import { managerAssignableRoleNames } from "../auth/auth.middleware";
 
 function getRouteParamId(value: string | string[] | undefined): string {
   if (Array.isArray(value)) {
@@ -63,6 +69,25 @@ export async function registerUserHandler(request: Request, response: Response):
     response.status(201).json({
       data: user,
       message: "Registration successful. Check your email for a link to activate your account.",
+    });
+  } catch (error: unknown) {
+    handleError(error, response);
+  }
+}
+
+export async function registerUserWithRoleHandler(request: Request, response: Response): Promise<void> {
+  try {
+    const input = parseRegisterUserWithRoleBody(request.body);
+    const isAdmin = request.auth?.roles.includes("ADMIN") ?? false;
+
+    if (!isAdmin && !managerAssignableRoleNames.includes(input.role)) {
+      throw new HttpError(403, "Managers may only assign CUSTOMER or DELIVERY_PARTNER roles");
+    }
+
+    const user = await registerUserWithRole(input);
+    response.status(201).json({
+      data: user,
+      message: "Registration successful. Check the user's email for an activation link.",
     });
   } catch (error: unknown) {
     handleError(error, response);
@@ -135,6 +160,15 @@ export async function deleteUserHandler(request: Request, response: Response): P
     const userId = parseUserId(getRouteParamId(request.params.id));
     const user = await deleteUser(userId);
     response.status(200).json({ data: user, message: "User deleted" });
+  } catch (error: unknown) {
+    handleError(error, response);
+  }
+}
+
+export async function loginUserHandler(request: Request, response: Response): Promise<void> {
+  try{
+    const user = await loginUser(parseLoginUserBody(request.body));
+    response.status(200).json({ data: user, message: "Login successful" });
   } catch (error: unknown) {
     handleError(error, response);
   }
