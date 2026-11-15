@@ -60,4 +60,7 @@ export const env = {
     pass: optional("SMTP_PASS"),
   },
   mailFrom: optional("MAIL_FROM") ?? "Kind Food <no-reply@kindfood.local>",
+
+  jwtSecret: required("JWT_SECRET"),
+  jwtExpiresIn: optional("JWT_EXPIRES_IN") ?? "1h",
 } as const;

@@ -8,20 +8,12 @@ export const axiosInstance = axios.create({
   }
 });
 
-export const apiConnector = (method, url, bodyData, headers, params) => {
-
-  console.log('API Request Details:');
-  console.log('Method:', method);
-  console.log('URL:', url);
-  console.log('Body Data:', bodyData);
-  console.log('Headers:', headers);
-  console.log('Params:', params);
-  
+export const apiConnector = (method, url, bodyData, headers = {}, params) => {
   return axiosInstance({
-    method: `${method}`,
-    url: `${url}`,
-    data: bodyData ? bodyData.data : null,
-    headers: headers ? headers : null,
-    params: params ? params : null,
+    method,
+    url,
+    data: bodyData,
+    headers,
+    params,
   });
 };

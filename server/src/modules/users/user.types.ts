@@ -1,4 +1,4 @@
-import type { Prisma, UserStatus } from "@prisma/client";
+import type { UserStatus, User } from "@prisma/client";
 
 // Body accepted by POST /users/register. Status is intentionally not accepted:
 // every self-registered account starts as PENDING until its email is verified.
@@ -8,6 +8,25 @@ export type RegisterUserBody = {
   phone?: string;
   firstName?: string;
   lastName?: string;
+};
+
+export const roleNames = [
+  "ADMIN",
+  "RESTAURANT_OWNER",
+  "MANAGER",
+  "CUSTOMER",
+  "DELIVERY_PARTNER",
+] as const;
+
+export type RoleName = (typeof roleNames)[number];
+
+export type RegisterUserWithRoleBody = RegisterUserBody & {
+  role: RoleName;
+};
+
+export type loginUserBody = {
+  email: string;
+  password: string;
 };
 
 export type UpdateUserBody = Partial<Omit<RegisterUserBody, "password">> & {
@@ -31,6 +50,17 @@ export const publicUserSelect = {
   activatedAt: true,
   createdAt: true,
   updatedAt: true,
-} satisfies Prisma.UserSelect;
+};
 
-export type PublicUser = Prisma.UserGetPayload<{ select: typeof publicUserSelect }>;
+export type PublicUser = Pick<
+  User,
+  | "id"
+  | "email"
+  | "phone"
+  | "firstName"
+  | "lastName"
+  | "status"
+  | "activatedAt"
+  | "createdAt"
+  | "updatedAt"
+>;
